@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:garden_madam/model.dart';
@@ -15,7 +16,17 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       home: ChangeNotifierProvider(
-        builder: (context) => Butler("Development", "local", null, true),
+        builder: (context) => Butler(
+            "Development",
+            "local",
+            List.of([
+              Pin("yellow", 27, 22, 21, Status.ON, null),
+              Pin("blue", 10, 11, 12, Status.OFF,
+                  Schedule(true, 10, 00, 11, 00, RepeatRate.DAILY)),
+              Pin("red", 1, 2, 3, Status.OFF,
+                  Schedule(false, 18, 00, 18, 30, RepeatRate.WEEKLY)),
+            ]),
+            true),
         child: ButlerDetailPage(),
       ),
     );
@@ -51,10 +62,12 @@ class _ButlerDetailPageState extends State<ButlerDetailPage> {
             children: <Widget>[
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(width: 10, color: butler.online ? Colors.green : Colors.red),
+                  border: Border.all(
+                      width: 10,
+                      color: butler.online ? Colors.green : Colors.red),
                   borderRadius: BorderRadius.circular(200),
                 ),
-                margin: const EdgeInsets.all(4),
+                margin: const EdgeInsets.fromLTRB(0, 20, 0, 10),
                 width: 200,
                 height: 200,
                 alignment: Alignment.center,
@@ -64,9 +77,9 @@ class _ButlerDetailPageState extends State<ButlerDetailPage> {
               Divider(
                 thickness: 3,
               ),
-              Text(
-                '$_counter',
-                style: Theme.of(context).textTheme.display1,
+              Expanded(child: ListView(children: _getValves(butler))),
+              Divider(
+                thickness: 3,
               ),
             ],
           ),
@@ -75,4 +88,49 @@ class _ButlerDetailPageState extends State<ButlerDetailPage> {
     });
   }
 
+  List<Container> _getValves(Butler butler) {
+    return butler.pins != null ? butler.pins.map(_getValve).toList() : [];
+  }
+
+  Container _getValve(Pin pin) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+        child: Row(
+      children: <Widget>[
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+                width: 5,
+                color: pin.status == Status.ON ? Colors.blue : Colors.grey),
+            borderRadius: BorderRadius.circular(50),
+          ),
+          margin: const EdgeInsets.fromLTRB(4, 4, 50, 4),
+          padding: EdgeInsets.all(5),
+          width: 50,
+          height: 50,
+          alignment: Alignment.center,
+          child: SvgPicture.asset('images/valve_1.svg',
+              semanticsLabel: 'Butler default image'),
+        ),
+        Expanded(
+            child: Text(
+          pin.name,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        )),
+        Expanded(child: _getScheduleIcon(pin))
+      ],
+    ));
+  }
+
+  Icon _getScheduleIcon(Pin pin) {
+    if (pin.schedule == null) {
+      return Icon(Icons.add_alarm, color: Colors.grey);
+    }
+
+    if (!pin.schedule.enabled) {
+      return Icon(Icons.access_alarm, color: Colors.grey);
+    }
+
+    return Icon(Icons.access_alarm, color: Colors.lightBlueAccent);
+  }
 }

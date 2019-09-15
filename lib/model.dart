@@ -8,7 +8,7 @@ class Butler extends ChangeNotifier {
   List<Pin> _pins;
   bool online;
 
-  UnmodifiableListView<Pin> get pins => UnmodifiableListView(_pins);
+  UnmodifiableListView<Pin> get pins => _pins != null ? UnmodifiableListView(_pins) : UnmodifiableListView([]);
 
   Butler(this.name, this.id, this._pins, this.online);
 }
