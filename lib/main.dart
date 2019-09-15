@@ -20,11 +20,11 @@ class MyApp extends StatelessWidget {
             "Development",
             "local",
             List.of([
-              Pin("yellow", 27, 22, 21, Status.ON, null),
+              Pin("yellow", 27, 22, 21, Status.ON, null, "valve_1.svg"),
               Pin("blue", 10, 11, 12, Status.OFF,
-                  Schedule(true, 10, 00, 11, 00, RepeatRate.DAILY)),
+                  Schedule(true, 10, 00, 11, 00, RepeatRate.DAILY), "valve_2.svg"),
               Pin("red", 1, 2, 3, Status.OFF,
-                  Schedule(false, 18, 00, 18, 30, RepeatRate.WEEKLY)),
+                  Schedule(false, 18, 00, 18, 30, RepeatRate.WEEKLY), "valve_3.svg"),
             ]),
             true),
         child: ButlerDetailPage(),
@@ -109,7 +109,7 @@ class _ButlerDetailPageState extends State<ButlerDetailPage> {
           width: 50,
           height: 50,
           alignment: Alignment.center,
-          child: SvgPicture.asset('images/valve_1.svg',
+          child: SvgPicture.asset( 'images/' + pin.imageName,
               semanticsLabel: 'Butler default image'),
         ),
         Expanded(

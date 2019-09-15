@@ -20,9 +20,10 @@ class Pin {
   int statusPinNumber;
   Status status;
   Schedule schedule;
+  String imageName;
 
   Pin(this.name, this.valvePinNumber, this.buttonPinNumber,
-      this.statusPinNumber, this.status, this.schedule);
+      this.statusPinNumber, this.status, this.schedule, this.imageName);
 }
 
 class Schedule {
