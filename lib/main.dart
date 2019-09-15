@@ -21,10 +21,22 @@ class MyApp extends StatelessWidget {
             "local",
             List.of([
               Pin("yellow", 27, 22, 21, Status.ON, null, "valve_1.svg"),
-              Pin("blue", 10, 11, 12, Status.OFF,
-                  Schedule(true, 10, 00, 11, 00, RepeatRate.DAILY), "valve_2.svg"),
-              Pin("red", 1, 2, 3, Status.OFF,
-                  Schedule(false, 18, 00, 18, 30, RepeatRate.WEEKLY), "valve_3.svg"),
+              Pin(
+                  "blue",
+                  10,
+                  11,
+                  12,
+                  Status.OFF,
+                  Schedule(true, 10, 00, 11, 00, RepeatRate.DAILY),
+                  "valve_2.svg"),
+              Pin(
+                  "red",
+                  1,
+                  2,
+                  3,
+                  Status.OFF,
+                  Schedule(false, 18, 00, 18, 30, RepeatRate.WEEKLY),
+                  "valve_3.svg"),
             ]),
             true),
         child: ButlerDetailPage(),
@@ -94,32 +106,32 @@ class _ButlerDetailPageState extends State<ButlerDetailPage> {
 
   Container _getValve(Pin pin) {
     return Container(
-      margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+        margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
         child: Row(
-      children: <Widget>[
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-                width: 5,
-                color: pin.status == Status.ON ? Colors.blue : Colors.grey),
-            borderRadius: BorderRadius.circular(50),
-          ),
-          margin: const EdgeInsets.fromLTRB(4, 4, 50, 4),
-          padding: EdgeInsets.all(5),
-          width: 50,
-          height: 50,
-          alignment: Alignment.center,
-          child: SvgPicture.asset( 'images/' + pin.imageName,
-              semanticsLabel: 'Butler default image'),
-        ),
-        Expanded(
-            child: Text(
-          pin.name,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        )),
-        Expanded(child: _getScheduleIcon(pin))
-      ],
-    ));
+          children: <Widget>[
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                    width: 5,
+                    color: pin.status == Status.ON ? Colors.blue : Colors.grey),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              margin: const EdgeInsets.fromLTRB(4, 4, 50, 4),
+              padding: EdgeInsets.all(5),
+              width: 50,
+              height: 50,
+              alignment: Alignment.center,
+              child: SvgPicture.asset('images/' + pin.imageName,
+                  semanticsLabel: 'Butler default image'),
+            ),
+            Expanded(
+                child: Text(
+              pin.name,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            )),
+            Expanded(child: _getScheduleIcon(pin))
+          ],
+        ));
   }
 
   Icon _getScheduleIcon(Pin pin) {
