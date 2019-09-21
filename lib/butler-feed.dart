@@ -88,26 +88,44 @@ class ButlerFeed {
   }
 
   void _updateButler() {
-    for (var valve in this._mqttLayoutStatus.valves) {
-      var pin = this._butler.findPin(valve.valve_pin_number);
-      if (pin == null) {
-        pin = Pin(valve.valve_pin_number);
-        this._butler.addPin(pin);
+    if (this._mqttLayoutStatus != null) {
+      for (var valve in this._mqttLayoutStatus.valves) {
+        var pin = this._butler.findPin(valve.valve_pin_number);
+        if (pin == null) {
+          pin = Pin(valve.valve_pin_number);
+          this._butler.addPin(pin);
+        }
+        var status;
+        switch (valve.status) {
+          case MqttValveStatus.OPEN:
+            status = Status.ON;
+            break;
+          case MqttValveStatus.CLOSED:
+            status = Status.OFF;
+            break;
+          case MqttValveStatus.UNKNOWN:
+            print('unknown valve status found');
+            status = Status.OFF;
+            break;
+        }
+        pin.status = status;
       }
-      var status;
-      switch (valve.status) {
-        case MqttValveStatus.OPEN:
-          status = Status.ON;
-          break;
-        case MqttValveStatus.CLOSED:
-          status = Status.OFF;
-          break;
-        case MqttValveStatus.UNKNOWN:
-          print('unknown valve status found');
-          status = Status.OFF;
-          break;
+    }
+    if (this._mqttWateringScheduleStatus != null &&
+        this._mqttWateringScheduleStatus.enabled) {
+      for (var schedule in this._mqttWateringScheduleStatus.schedules) {
+        var pin = this._butler.findPin(schedule.valve);
+        if (pin == null) {
+          pin = Pin(schedule.valve);
+          this._butler.addPin(pin);
+        }
+
+        var cronExpression = schedule.schedule.cron_expression;
+        var durationSeconds = schedule.schedule.duration_seconds;
+        if (cronExpression != null && durationSeconds != null) {
+          pin.schedule = Schedule(cronExpression, durationSeconds);
+        }
       }
-      pin.status = status;
     }
 
     this._streamController.add(this._butler);

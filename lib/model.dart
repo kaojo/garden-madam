@@ -44,15 +44,12 @@ class Pin {
 }
 
 class Schedule {
-  bool enabled;
-  int startHour;
-  int startMinute;
-  int endHour;
-  int endMinute;
-  RepeatRate repeatRate;
+  bool enabled = true;
+  String cronExpression;
+  int durationSeconds;
 
-  Schedule(this.enabled, this.startHour, this.startMinute, this.endHour,
-      this.endMinute, this.repeatRate);
+  Schedule(this.cronExpression, this.durationSeconds, {this.enabled = true});
+
 }
 
 enum RepeatRate { HOURLY, DAILY, WEEKLY }
