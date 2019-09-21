@@ -26,7 +26,6 @@ class MyApp extends StatelessWidget {
       home: StreamBuilder<Butler>(
         stream: butlerFeed.stream, // a Stream<int> or null
         builder: (BuildContext context, AsyncSnapshot<Butler> snapshot) {
-          print('build stream widget');
           if (snapshot.hasError) return Text('Error: ${snapshot.error}');
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -44,11 +43,4 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  FutureOr onValue(MqttClientConnectionStatus value) {
-    print(value);
-  }
-
-  FutureOr subscribeToButlerStatusStreams(_value) {
-
-  }
 }

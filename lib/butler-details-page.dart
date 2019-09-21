@@ -47,7 +47,6 @@ class ButlerDetailsPage extends StatelessWidget {
   }
 
   List<Container> _getValves(Butler butler) {
-    print(butler.pins.length);
     return butler.pins != null ? butler.pins.map(_getValve).toList() : [];
   }
 
