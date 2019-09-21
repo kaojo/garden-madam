@@ -1,29 +1,46 @@
 import 'dart:collection';
 
-import 'package:flutter/widgets.dart';
+import 'dart:math';
 
-class Butler extends ChangeNotifier {
-  String name;
-  String id;
+class Butler {
+  final String name;
+  final String id;
   List<Pin> _pins;
-  bool online;
+  bool online = false;
 
   UnmodifiableListView<Pin> get pins => _pins != null ? UnmodifiableListView(_pins) : UnmodifiableListView([]);
 
-  Butler(this.name, this.id, this._pins, this.online);
+  Butler(this.id, this.name);
+  Pin findPin(int pinNumber) {
+    for (var pin in this.pins) {
+      if (pin.valvePinNumber == pinNumber) {
+        return pin;
+      }
+    }
+    return null;
+  }
+
+  void addPin(Pin pin) {
+    if (this.findPin(pin.valvePinNumber) == null) {
+      if (this._pins == null) {
+        this._pins = List();
+      }
+      this._pins.add(pin);
+    }
+  }
 }
 
 class Pin {
   String name;
-  int valvePinNumber;
+  final int valvePinNumber;
   int buttonPinNumber;
   int statusPinNumber;
-  Status status;
+  Status status = Status.OFF;
   Schedule schedule;
   String imageName;
 
-  Pin(this.name, this.valvePinNumber, this.buttonPinNumber,
-      this.statusPinNumber, this.status, this.schedule, this.imageName);
+  Pin(this.valvePinNumber);
+
 }
 
 class Schedule {
