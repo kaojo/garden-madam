@@ -13,6 +13,7 @@ class ButlerFeed {
 
   MqttLayoutStatus _mqttLayoutStatus;
   MqttWateringSchedule _mqttWateringScheduleStatus;
+  String _mqttHealthStatus;
 
   ButlerFeed(String id, String name, MqttConfig mqttConfig) {
     this._butler = Butler(id, name);
@@ -43,6 +44,10 @@ class ButlerFeed {
     return this._butler.id + '/garden-butler/status/layout-config';
   }
 
+  String get _healthStatusTopic {
+    return this._butler.id + '/garden-butler/status/health';
+  }
+
   /// The successful connect callback
   void _onConnected() {
     print("connected successful");
@@ -56,9 +61,8 @@ class ButlerFeed {
   Future subscribeToButlerStatusStreams(_) async {
     print(_layoutStatusTopic);
     this._mqttClient.subscribe(_layoutStatusTopic, MqttQos.exactlyOnce);
-    this
-        ._mqttClient
-        .subscribe(_wateringScheduleStatusTopic, MqttQos.exactlyOnce);
+    this._mqttClient.subscribe(_wateringScheduleStatusTopic, MqttQos.exactlyOnce);
+    this._mqttClient.subscribe(_healthStatusTopic, MqttQos.exactlyOnce);
 
     this._mqttClient.updates.listen(onStatusMessageReceived);
   }
@@ -82,6 +86,14 @@ class ButlerFeed {
 
         this._mqttWateringScheduleStatus =
             MqttWateringSchedule.fromJson(json.decode(payload));
+      }
+      if (messageWrapper.topic == _healthStatusTopic) {
+        MqttPublishMessage publishMessage = messageWrapper.payload;
+        var payload = MqttPublishPayload.bytesToStringAsString(
+            publishMessage.payload.message);
+        print(payload);
+
+        this._mqttHealthStatus = payload;
       }
       _updateButler();
     }
@@ -127,7 +139,9 @@ class ButlerFeed {
         }
       }
     }
-
+    if (_mqttHealthStatus != null && _mqttHealthStatus == "ONLINE") {
+      this._butler.online = true;
+    }
     this._streamController.add(this._butler);
   }
 }
