@@ -22,9 +22,9 @@ class ButlerFeed {
     this._mqttClient.secure = true;
     this._mqttClient.onConnected = _onConnected;
     this._mqttClient.onSubscribed = _onSubscribed;
-    this
-        ._mqttClient
+    this._mqttClient
         .connect(mqttConfig.username, mqttConfig.password)
+        .catchError((error) => this._streamController.addError(error))
         .then(subscribeToButlerStatusStreams);
   }
 
@@ -59,7 +59,6 @@ class ButlerFeed {
   }
 
   Future subscribeToButlerStatusStreams(_) async {
-    print(_layoutStatusTopic);
     this._mqttClient.subscribe(_layoutStatusTopic, MqttQos.exactlyOnce);
     this._mqttClient.subscribe(_wateringScheduleStatusTopic, MqttQos.exactlyOnce);
     this._mqttClient.subscribe(_healthStatusTopic, MqttQos.exactlyOnce);

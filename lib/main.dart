@@ -28,16 +28,11 @@ class MyApp extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<Butler> snapshot) {
           if (snapshot.hasError) return Text('Error: ${snapshot.error}');
           switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return Text('ConnectionState.none');
-            case ConnectionState.waiting:
-              return Text('ConnectionState.waiting');
             case ConnectionState.active:
               return ButlerDetailsPage(snapshot.data);
-            case ConnectionState.done:
-              return Text('\$${snapshot.data.name} (closed)');
+            default:
+              return Text('Could not load the data to your butler data.');
           }
-          return null; // unreachable
         },
       ),
     );
