@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:mqtt_client/mqtt_client.dart';
+import 'package:typed_data/typed_data.dart';
 
 import 'model.dart';
 import 'mqtt.dart';
 
-class ButlerFeed {
+class ButlerController {
   StreamController<Butler> _streamController = StreamController<Butler>();
   Butler _butler;
   MqttClient _mqttClient;
@@ -15,7 +16,7 @@ class ButlerFeed {
   MqttWateringSchedule _mqttWateringScheduleStatus;
   String _mqttHealthStatus;
 
-  ButlerFeed(String id, String name, MqttConfig mqttConfig) {
+  ButlerController(String id, String name, MqttConfig mqttConfig) {
     this._butler = Butler(id, name);
     this._mqttClient = MqttClient.withPort(
         mqttConfig.hostname, mqttConfig.client_id, mqttConfig.port);
@@ -46,6 +47,14 @@ class ButlerFeed {
 
   String get _healthStatusTopic {
     return this._butler.id + '/garden-butler/status/health';
+  }
+
+  String get _layoutOpenCommandTopic {
+    return this._butler.id + '/garden-butler/command/layout/open';
+  }
+
+  String get _layoutCloseCommandTopic {
+    return this._butler.id + '/garden-butler/command/layout/close';
   }
 
   /// The successful connect callback
@@ -122,8 +131,7 @@ class ButlerFeed {
         pin.status = status;
       }
     }
-    if (this._mqttWateringScheduleStatus != null &&
-        this._mqttWateringScheduleStatus.enabled) {
+    if (this._mqttWateringScheduleStatus != null) {
       for (var schedule in this._mqttWateringScheduleStatus.schedules) {
         var pin = this._butler.findPin(schedule.valve);
         if (pin == null) {
@@ -134,7 +142,7 @@ class ButlerFeed {
         var cronExpression = schedule.schedule.cron_expression;
         var durationSeconds = schedule.schedule.duration_seconds;
         if (cronExpression != null && durationSeconds != null) {
-          pin.schedule = Schedule(cronExpression, durationSeconds);
+          pin.schedule = Schedule(cronExpression, durationSeconds, enabled: this._mqttWateringScheduleStatus.enabled);
         }
       }
     }
@@ -142,5 +150,28 @@ class ButlerFeed {
       this._butler.online = true;
     }
     this._streamController.add(this._butler);
+  }
+
+  void notifyChanges() {
+    this._streamController.add(this._butler);
+  }
+
+  void turn_off(Pin pin) {
+    Uint8Buffer buffer = _convertPinNumberToPayload(pin);
+    this._mqttClient.publishMessage(this._layoutCloseCommandTopic, MqttQos.exactlyOnce, buffer);
+    this.notifyChanges();
+  }
+
+  void turn_on(Pin pin) {
+    Uint8Buffer buffer = _convertPinNumberToPayload(pin);
+    this._mqttClient.publishMessage(this._layoutOpenCommandTopic, MqttQos.exactlyOnce, buffer);
+    this.notifyChanges();
+  }
+
+  Uint8Buffer _convertPinNumberToPayload(Pin pin) {
+    var data = utf8.encode(pin.valvePinNumber.toString());
+    var buffer = new Uint8Buffer();
+    buffer.addAll(data);
+    return buffer;
   }
 }

@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    var butlerFeed = ButlerFeed("local", "Local Development", MqttConfig("mqtt.flespi.io",  8883, "FlespiToken 2PytGtM3gJZWa4JmJy1cDYuTkeZAmubd7xwCP8vVFiFEcdQKBFM2r4JB8wZjOZmM", "","garden_madam_dev"));
+    var butlerController = ButlerController("local", "Local Development", MqttConfig("mqtt.flespi.io",  8883, "FlespiToken 2PytGtM3gJZWa4JmJy1cDYuTkeZAmubd7xwCP8vVFiFEcdQKBFM2r4JB8wZjOZmM", "","garden_madam_dev"));
 
     return MaterialApp(
       title: 'Garden Madam',
@@ -24,12 +24,12 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       home: StreamBuilder<Butler>(
-        stream: butlerFeed.stream, // a Stream<int> or null
+        stream: butlerController.stream, // a Stream<int> or null
         builder: (BuildContext context, AsyncSnapshot<Butler> snapshot) {
           if (snapshot.hasError) return Text('Error: ${snapshot.error}');
           switch (snapshot.connectionState) {
             case ConnectionState.active:
-              return ButlerDetailsPage(snapshot.data);
+              return ButlerDetailsPage(snapshot.data, butlerController);
             default:
               return Text('Could not load the data to your butler data.');
           }

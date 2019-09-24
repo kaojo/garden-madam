@@ -1,6 +1,7 @@
 import 'dart:collection';
 
-import 'dart:math';
+import 'package:garden_madam/butler-feed.dart';
+
 
 class Butler {
   final String name;
@@ -28,6 +29,7 @@ class Butler {
       this._pins.add(pin);
     }
   }
+
 }
 
 class Pin {
@@ -41,6 +43,18 @@ class Pin {
 
   Pin(this.valvePinNumber);
 
+  void toggle(ButlerController butlerController) {
+    switch (status) {
+      case Status.ON:
+        butlerController.turn_off(this);
+        status = Status.OFF;
+        break;
+      case Status.OFF:
+        butlerController.turn_on(this);
+        status = Status.ON;
+        break;
+    }
+  }
 }
 
 class Schedule {
