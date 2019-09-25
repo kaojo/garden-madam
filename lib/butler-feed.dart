@@ -148,6 +148,8 @@ class ButlerController {
     }
     if (_mqttHealthStatus != null && _mqttHealthStatus == "ONLINE") {
       this._butler.online = true;
+    } else {
+      this._butler.online = false;
     }
     this._streamController.add(this._butler);
   }
