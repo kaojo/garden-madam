@@ -159,12 +159,14 @@ class ButlerController {
   }
 
   void turn_off(Pin pin) {
+    pin.status = Status.OFF;
     Uint8Buffer buffer = _convertPinNumberToPayload(pin);
     this._mqttClient.publishMessage(this._layoutCloseCommandTopic, MqttQos.exactlyOnce, buffer);
     this.notifyChanges();
   }
 
   void turn_on(Pin pin) {
+    pin.status = Status.ON;
     Uint8Buffer buffer = _convertPinNumberToPayload(pin);
     this._mqttClient.publishMessage(this._layoutOpenCommandTopic, MqttQos.exactlyOnce, buffer);
     this.notifyChanges();

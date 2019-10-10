@@ -13,38 +13,46 @@ class ValvesListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () {print("tap");},
-      leading: new GestureDetector(
-        onTap: () => _pin.toggle(_butlerController),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-                width: 5,
-                color:
-                    _pin.status == Status.ON ? Colors.blue : Colors.grey),
-            borderRadius: BorderRadius.circular(50),
-          ),
-          margin: const EdgeInsets.fromLTRB(4, 4, 50, 4),
-          padding: EdgeInsets.all(5),
-          width: 50,
-          height: 50,
-          alignment: Alignment.center,
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (BuildContext context) {
+          return ValvePage(_pin);
+        }));
+      },
+      contentPadding: EdgeInsets.only(bottom: 20.0),
+      leading: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+              width: 5,
+              color: _pin.status == Status.ON ? Colors.blue : Colors.grey),
+          borderRadius: BorderRadius.circular(50),
+        ),
+        padding: EdgeInsets.all(5),
+        width: 50,
+        height: 50,
+        alignment: Alignment.center,
+        child: Hero(
+          tag: _pin.valvePinNumber,
           child: SvgPicture.asset(
               'images/' +
-                  (_pin.imageName != null
-                      ? _pin.imageName
-                      : 'valve_1.svg'),
-              semanticsLabel: 'Butler default image'),
+                  (_pin.imageName != null ? _pin.imageName : 'valve_1.svg'),
+              semanticsLabel: 'Valve default image'),
         ),
       ),
       title: Text(
-        _pin.name != null
-            ? _pin.name
-            : _pin.valvePinNumber.toString(),
+        _pin.name(),
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
-      trailing: _getScheduleIcon(_pin),
-
+      trailing: Switch(
+        value: _pin.status == Status.ON,
+        onChanged: (bool newValue) {
+          if (_pin.status == Status.ON) {
+            _butlerController.turn_off(_pin);
+          } else {
+            _butlerController.turn_on(_pin);
+          }
+        },
+      ),
     );
   }
 }
@@ -59,4 +67,26 @@ Icon _getScheduleIcon(Pin pin) {
   }
 
   return Icon(Icons.access_alarm, color: Colors.lightBlueAccent);
+}
+
+class ValvePage extends StatelessWidget {
+  Pin _pin;
+
+  ValvePage(this._pin);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_pin.name()),
+      ),
+      body: Hero(
+        tag: _pin.valvePinNumber,
+        child: SvgPicture.asset(
+            'images/' +
+                (_pin.imageName != null ? _pin.imageName : 'valve_1.svg'),
+            semanticsLabel: 'Valve default image'),
+      ),
+    );
+  }
 }

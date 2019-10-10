@@ -33,7 +33,7 @@ class Butler {
 }
 
 class Pin {
-  String name;
+  String _name;
   final int valvePinNumber;
   int buttonPinNumber;
   int statusPinNumber;
@@ -43,20 +43,14 @@ class Pin {
 
   Pin(this.valvePinNumber);
 
-  void toggle(ButlerController butlerController) {
-    switch (status) {
-      case Status.ON:
-        butlerController.turn_off(this);
-        status = Status.OFF;
-        break;
-      case Status.OFF:
-        butlerController.turn_on(this);
-        status = Status.ON;
-        break;
+  String name() {
+    if (_name != null && _name != "") {
+      return _name;
+    } else {
+      return "Pin " + valvePinNumber.toString();
     }
   }
 }
-
 class Schedule {
   bool enabled = true;
   String cronExpression;

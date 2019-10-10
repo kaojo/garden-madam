@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:garden_madam/butler-feed.dart';
 import 'package:garden_madam/details/valve.dart';
@@ -18,6 +19,7 @@ class ButlerDetailsPage extends StatelessWidget {
         title: Text(_butler.name),
       ),
       body: ListView(
+        padding: EdgeInsets.all(10.0),
         children: <Widget>[
           Center(
             child: Container(
@@ -27,7 +29,7 @@ class ButlerDetailsPage extends StatelessWidget {
                     color: _butler.online ? Colors.green : Colors.red),
                 borderRadius: BorderRadius.circular(200),
               ),
-              margin: const EdgeInsets.fromLTRB(0, 20, 0, 10),
+              margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
               width: 200,
               height: 200,
               alignment: Alignment.center,
