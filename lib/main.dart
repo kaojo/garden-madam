@@ -6,7 +6,7 @@ import 'package:garden_madam/model.dart';
 import 'package:garden_madam/mqtt.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
-import 'butler-details-page.dart';
+import 'details/page.dart';
 
 void main() => runApp(MyApp());
 
