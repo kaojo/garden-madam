@@ -14,11 +14,7 @@ class ButlerDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_butler.name),
-      ),
-      body: ListView(
+    return ListView(
         children: <Widget>[
           Container(
               color: Colors.grey[300],
@@ -42,7 +38,6 @@ class ButlerDetailsPage extends StatelessWidget {
               ),
               ..._getValves(_butler, _butlerController)
         ],
-      ),
     );
   }
 

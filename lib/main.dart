@@ -26,13 +26,26 @@ class MyApp extends StatelessWidget {
       home: StreamBuilder<Butler>(
         stream: butlerController.stream, // a Stream<int> or null
         builder: (BuildContext context, AsyncSnapshot<Butler> snapshot) {
-          if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+          Widget body;
+          Butler butler = null;
+          if (snapshot.hasError) body = Text('Error: ${snapshot.error}');
           switch (snapshot.connectionState) {
             case ConnectionState.active:
-              return ButlerDetailsPage(snapshot.data, butlerController);
+              butler = snapshot.data;
+              body = ButlerDetailsPage(butler, butlerController);
+              break;
             default:
-              return Text('Could not load the data to your butler data.');
+              body = new Center(
+                child: new CircularProgressIndicator(),
+              );
+              break;
           }
+          return Scaffold(
+              appBar: AppBar(
+              title: butler != null && butler.name != null ? Text(butler.name) : Text('Loading'),
+          ),
+          body: body
+          );
         },
       ),
     );

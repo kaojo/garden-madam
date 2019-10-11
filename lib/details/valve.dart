@@ -45,16 +45,46 @@ class ValvesListItem extends StatelessWidget {
       ),
       trailing: Switch(
         value: _pin.status == Status.ON,
-        onChanged: (bool newValue) {
+        onChanged: togglePin(context, _pin),
+      ),
+    );
+  }
+
+  void handleMqttError(BuildContext context, Pin pin, bool newValue) {
+    pin.status = newValue ? Status.OFF : Status.ON;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Connection Error"),
+          content: new Text("Could not reach your butler. Try again later."),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  togglePin(BuildContext context, Pin pin) => (bool newValue) {
+        try {
           if (_pin.status == Status.ON) {
             _butlerController.turn_off(_pin);
           } else {
             _butlerController.turn_on(_pin);
           }
-        },
-      ),
-    );
-  }
+        } on Exception catch (e) {
+          print(e);
+          handleMqttError(context, _pin, newValue);
+        }
+      };
 }
 
 Icon _getScheduleIcon(Pin pin) {
