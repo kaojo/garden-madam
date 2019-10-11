@@ -19,17 +19,17 @@ class ValvesListItem extends StatelessWidget {
           return ValvePage(_pin);
         }));
       },
-      contentPadding: EdgeInsets.only(bottom: 20.0),
+      contentPadding: EdgeInsets.only(left: 10, bottom: 20.0),
       leading: Container(
         decoration: BoxDecoration(
           border: Border.all(
-              width: 5,
+              width: 4,
               color: _pin.status == Status.ON ? Colors.blue : Colors.grey),
-          borderRadius: BorderRadius.circular(50),
+          borderRadius: BorderRadius.circular(45),
         ),
         padding: EdgeInsets.all(5),
-        width: 50,
-        height: 50,
+        width: 45,
+        height: 45,
         alignment: Alignment.center,
         child: Hero(
           tag: _pin.valvePinNumber,
@@ -80,12 +80,22 @@ class ValvePage extends StatelessWidget {
       appBar: AppBar(
         title: Text(_pin.name()),
       ),
-      body: Hero(
-        tag: _pin.valvePinNumber,
-        child: SvgPicture.asset(
-            'images/' +
-                (_pin.imageName != null ? _pin.imageName : 'valve_1.svg'),
-            semanticsLabel: 'Valve default image'),
+      body: ListView(
+        children: <Widget>[
+          Hero(
+            tag: _pin.valvePinNumber,
+            child: Container(
+              height: 200,
+              padding: const EdgeInsets.all(10.0),
+              color: Colors.grey[300],
+              child: SvgPicture.asset(
+                'images/' +
+                    (_pin.imageName != null ? _pin.imageName : 'valve_1.svg'),
+                semanticsLabel: 'Valve default image',
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

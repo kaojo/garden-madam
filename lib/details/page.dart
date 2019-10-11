@@ -19,35 +19,35 @@ class ButlerDetailsPage extends StatelessWidget {
         title: Text(_butler.name),
       ),
       body: ListView(
-        padding: EdgeInsets.all(10.0),
         children: <Widget>[
-          Center(
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                    width: 10,
-                    color: _butler.online ? Colors.green : Colors.red),
-                borderRadius: BorderRadius.circular(200),
+          Container(
+              color: Colors.grey[300],
+              margin: EdgeInsets.only(bottom: 10),
+              child: Center(
+                child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 10,
+                          color: _butler.online ? Colors.green : Colors.red),
+                      borderRadius: BorderRadius.circular(200),
+                    ),
+                    margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                    width: 200,
+                    height: 200,
+                    alignment: Alignment.center,
+                    child: SvgPicture.asset('images/butler.svg',
+                        semanticsLabel: 'Butler default image'),
+                  ),
+                ),
               ),
-              margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-              width: 200,
-              height: 200,
-              alignment: Alignment.center,
-              child: SvgPicture.asset('images/butler.svg',
-                  semanticsLabel: 'Butler default image'),
-            ),
-          ),
-          Divider(
-            thickness: 3,
-          ),
-          ..._getValves(_butler, _butlerController)
+              ..._getValves(_butler, _butlerController)
         ],
       ),
     );
   }
 
-  List<ValvesListItem> _getValves(
-      Butler butler, ButlerController butlerController) {
+  List<ValvesListItem> _getValves(Butler butler,
+      ButlerController butlerController) {
     return butler.pins != null
         ? butler.pins.map((pin) => _getValve(pin, butlerController)).toList()
         : [];
