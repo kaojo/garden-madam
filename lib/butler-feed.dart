@@ -15,18 +15,16 @@ class ButlerController {
   MqttLayoutStatus _mqttLayoutStatus;
   MqttWateringSchedule _mqttWateringScheduleStatus;
   String _mqttHealthStatus;
+  MqttConfig _mqttConfig;
 
-  ButlerController(String id, String name, MqttConfig mqttConfig) {
+  ButlerController(String id, String name, this._mqttConfig) {
     this._butler = Butler(id, name);
     this._mqttClient = MqttClient.withPort(
-        mqttConfig.hostname, mqttConfig.client_id, mqttConfig.port);
+        _mqttConfig.hostname, _mqttConfig.client_id, _mqttConfig.port);
     this._mqttClient.secure = true;
     this._mqttClient.onConnected = _onConnected;
     this._mqttClient.onSubscribed = _onSubscribed;
-    this._mqttClient
-        .connect(mqttConfig.username, mqttConfig.password)
-        .catchError((error) => this._streamController.addError(error))
-        .then(subscribeToButlerStatusStreams);
+    _connect();
   }
 
   Stream<Butler> get stream {
@@ -67,12 +65,27 @@ class ButlerController {
     print('Subscription confirmed for topic $topic');
   }
 
-  Future subscribeToButlerStatusStreams(_) async {
-    this._mqttClient.subscribe(_layoutStatusTopic, MqttQos.exactlyOnce);
-    this._mqttClient.subscribe(_wateringScheduleStatusTopic, MqttQos.exactlyOnce);
-    this._mqttClient.subscribe(_healthStatusTopic, MqttQos.exactlyOnce);
-
-    this._mqttClient.updates.listen(onStatusMessageReceived);
+  Future subscribeToButlerStatusStreams(
+      MqttClientConnectionStatus status) async {
+    if (status != null && status.state == MqttConnectionState.connected) {
+      this._mqttClient.subscribe(_layoutStatusTopic, MqttQos.exactlyOnce);
+      this
+          ._mqttClient
+          .subscribe(_wateringScheduleStatusTopic, MqttQos.exactlyOnce);
+      this._mqttClient.subscribe(_healthStatusTopic, MqttQos.exactlyOnce);
+      this._mqttClient.updates.listen(onStatusMessageReceived,
+          onError: (error) {
+        print(error);
+        this._streamController.addError(error);
+      });
+    } else {
+      print('${status}');
+      if (status != null) print('${status.state}');
+      print(this._mqttClient.connectionStatus.returnCode);
+      this
+          ._streamController
+          .addError("Could not subscribe to butler status topics.");
+    }
   }
 
   void onStatusMessageReceived(List<MqttReceivedMessage<MqttMessage>> event) {
@@ -142,7 +155,8 @@ class ButlerController {
         var cronExpression = schedule.schedule.cron_expression;
         var durationSeconds = schedule.schedule.duration_seconds;
         if (cronExpression != null && durationSeconds != null) {
-          pin.schedule = Schedule(cronExpression, durationSeconds, enabled: this._mqttWateringScheduleStatus.enabled);
+          pin.schedule = Schedule(cronExpression, durationSeconds,
+              enabled: this._mqttWateringScheduleStatus.enabled);
         }
       }
     }
@@ -161,14 +175,16 @@ class ButlerController {
   void turn_off(Pin pin) {
     pin.status = Status.OFF;
     Uint8Buffer buffer = _convertPinNumberToPayload(pin);
-    this._mqttClient.publishMessage(this._layoutCloseCommandTopic, MqttQos.exactlyOnce, buffer);
+    this._mqttClient.publishMessage(
+        this._layoutCloseCommandTopic, MqttQos.exactlyOnce, buffer);
     this.notifyChanges();
   }
 
   void turn_on(Pin pin) {
     pin.status = Status.ON;
     Uint8Buffer buffer = _convertPinNumberToPayload(pin);
-    this._mqttClient.publishMessage(this._layoutOpenCommandTopic, MqttQos.exactlyOnce, buffer);
+    this._mqttClient.publishMessage(
+        this._layoutOpenCommandTopic, MqttQos.exactlyOnce, buffer);
     this.notifyChanges();
   }
 
@@ -177,5 +193,29 @@ class ButlerController {
     var buffer = new Uint8Buffer();
     buffer.addAll(data);
     return buffer;
+  }
+
+  refresh() async {
+    print('refresh');
+    if (this._mqttClient.connectionStatus == null ||
+        this._mqttClient.connectionStatus.state !=
+            MqttConnectionState.connected) {
+      print('try reconnect');
+      _connect();
+    }
+    this.notifyChanges();
+  }
+
+  void _connect() {
+    print('Starting connection to mqtt server.');
+    this
+        ._mqttClient
+        .connect(_mqttConfig.username, _mqttConfig.password)
+        .timeout(Duration(seconds: 5))
+        .then(subscribeToButlerStatusStreams)
+        .catchError((error) {
+      print('Could not connect mqtt client: ${error}');
+      this._streamController.addError(error);
+    });
   }
 }

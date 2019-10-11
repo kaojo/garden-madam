@@ -14,6 +14,7 @@ class ButlerDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('building butler detail widget');
     return ListView(
         children: <Widget>[
           Container(
