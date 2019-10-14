@@ -4,10 +4,10 @@ import 'dart:convert';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:typed_data/typed_data.dart';
 
-import 'models/butler.dart';
-import 'models/pin.dart';
-import 'models/schedule.dart';
-import 'mqtt.dart';
+import '../models/butler.dart';
+import '../models/pin.dart';
+import '../models/schedule.dart';
+import '../datahandlers/mqtt.dart';
 
 class ButlerController {
   StreamController<Butler> _streamController = StreamController<Butler>();
@@ -39,10 +39,6 @@ class ButlerController {
 
   String get _wateringScheduleStatusTopic {
     return this._butler.id + '/garden-butler/status/watering-schedule';
-  }
-
-  String get _layoutConfigStatusTopic {
-    return this._butler.id + '/garden-butler/status/layout-config';
   }
 
   String get _healthStatusTopic {

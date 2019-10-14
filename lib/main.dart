@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:garden_madam/butler-feed.dart';
-import 'package:garden_madam/mqtt.dart';
+import 'package:garden_madam/blocs/butler-feed.dart';
+import 'package:garden_madam/datahandlers/mqtt.dart';
 
 import 'models/butler.dart';
 import 'ui/butler-details-page.dart';
