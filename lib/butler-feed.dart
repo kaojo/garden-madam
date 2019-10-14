@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:typed_data/typed_data.dart';
 
-import 'model.dart';
+import 'models/butler.dart';
+import 'models/pin.dart';
+import 'models/schedule.dart';
 import 'mqtt.dart';
 
 class ButlerController {
