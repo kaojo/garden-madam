@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:garden_madam/blocs/butler-feed.dart';
+import 'package:garden_madam/blocs/butler_feed.dart';
 import 'package:garden_madam/models/butler.dart';
 import 'package:garden_madam/models/pin.dart';
-import 'package:garden_madam/ui/valve-details-page.dart';
+import 'package:garden_madam/ui/valve_details_page.dart';
 
 class ButlerDetailsPage extends StatelessWidget {
   final Butler _butler;

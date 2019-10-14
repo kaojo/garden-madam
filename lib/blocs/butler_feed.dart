@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:garden_madam/datahandlers/health_status_mqtt_client.dart';
+import 'package:garden_madam/datahandlers/layout_status_handler.dart';
+import 'package:garden_madam/datahandlers/schedule_status_handler.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:typed_data/typed_data.dart';
 
@@ -16,8 +19,8 @@ class ButlerController {
 
   MqttLayoutStatus _mqttLayoutStatus;
   MqttWateringSchedule _mqttWateringScheduleStatus;
-  String _mqttHealthStatus;
   MqttConfig _mqttConfig;
+  ButlerHealthStatusMqttClient _butlerHealthStatusMqttClient;
 
   ButlerController(String id, String name, this._mqttConfig) {
     this._butler = Butler(id, name);
@@ -26,6 +29,8 @@ class ButlerController {
     this._mqttClient.secure = true;
     this._mqttClient.onConnected = _onConnected;
     this._mqttClient.onSubscribed = _onSubscribed;
+    this._butlerHealthStatusMqttClient =
+        ButlerHealthStatusMqttClient(mqttClient: _mqttClient);
     _connect();
   }
 
@@ -39,10 +44,6 @@ class ButlerController {
 
   String get _wateringScheduleStatusTopic {
     return this._butler.id + '/garden-butler/status/watering-schedule';
-  }
-
-  String get _healthStatusTopic {
-    return this._butler.id + '/garden-butler/status/health';
   }
 
   String get _layoutOpenCommandTopic {
@@ -70,11 +71,22 @@ class ButlerController {
       this
           ._mqttClient
           .subscribe(_wateringScheduleStatusTopic, MqttQos.exactlyOnce);
-      this._mqttClient.subscribe(_healthStatusTopic, MqttQos.exactlyOnce);
       this._mqttClient.updates.listen(onStatusMessageReceived,
           onError: (error) {
         print(error);
         this._streamController.addError(error);
+      });
+
+      this
+          ._butlerHealthStatusMqttClient
+          .getHealthStatus(this._butler.id)
+          .forEach((status) {
+        if (status == MqttHealthStatus.online) {
+          this._butler.online = true;
+        } else {
+          this._butler.online = false;
+        }
+        notifyChanges();
       });
     } else {
       print('${status}');
@@ -106,19 +118,11 @@ class ButlerController {
         this._mqttWateringScheduleStatus =
             MqttWateringSchedule.fromJson(json.decode(payload));
       }
-      if (messageWrapper.topic == _healthStatusTopic) {
-        MqttPublishMessage publishMessage = messageWrapper.payload;
-        var payload = MqttPublishPayload.bytesToStringAsString(
-            publishMessage.payload.message);
-        print(payload);
-
-        this._mqttHealthStatus = payload;
-      }
       _updateButler();
     }
   }
 
-  void _updateButler() {
+  Future _updateButler() async {
     if (this._mqttLayoutStatus != null) {
       for (var valve in this._mqttLayoutStatus.valves) {
         var pin = this._butler.findPin(valve.valve_pin_number);
@@ -157,11 +161,6 @@ class ButlerController {
               enabled: this._mqttWateringScheduleStatus.enabled);
         }
       }
-    }
-    if (_mqttHealthStatus != null && _mqttHealthStatus == "ONLINE") {
-      this._butler.online = true;
-    } else {
-      this._butler.online = false;
     }
     this._streamController.add(this._butler);
   }
