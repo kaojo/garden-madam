@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:typed_data/typed_data.dart';
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
@@ -12,6 +13,15 @@ class ButlerLayoutStatusMqttClient {
   String _getLayoutStatusTopic(String deviceId) {
     return '$deviceId/garden-butler/status/layout';
   }
+
+  String _layoutOpenCommandTopic(String deviceId) {
+    return '$deviceId/garden-butler/command/layout/open';
+  }
+
+  String _layoutCloseCommandTopic(String deviceId) {
+    return '$deviceId/garden-butler/command/layout/close';
+  }
+
 
   Stream<MqttLayoutStatus> getLayoutStatus(String deviceId) {
     if (mqttClient.getSubscriptionsStatus(_getLayoutStatusTopic(deviceId)) ==
@@ -50,6 +60,26 @@ class ButlerLayoutStatusMqttClient {
         MqttLayoutStatus.fromJson(json.decode(payload));
     return status;
   }
+
+  void turnOff(String deviceId, int valvePinNumber) {
+    Uint8Buffer buffer = _convertPinNumberToPayload(valvePinNumber);
+    this.mqttClient.publishMessage(
+        _layoutCloseCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
+  }
+
+  void turnOn(String deviceId, int valvePinNumber) {
+    Uint8Buffer buffer = _convertPinNumberToPayload(valvePinNumber);
+    this.mqttClient.publishMessage(
+        _layoutOpenCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
+  }
+
+  Uint8Buffer _convertPinNumberToPayload(int valvePinNumber) {
+    var data = utf8.encode(valvePinNumber.toString());
+    var buffer = new Uint8Buffer();
+    buffer.addAll(data);
+    return buffer;
+  }
+
 }
 
 class MqttLayoutStatus {
@@ -67,12 +97,12 @@ class MqttLayoutStatus {
     this._valves = List();
     if (valves != null) {
       for (var v in valves) {
-        var valve_pin_number = v['valve_pin_number'];
+        var valvePinNumber = v['valve_pin_number'];
         var status = v['status'];
-        if (status != null && valve_pin_number != null) {
+        if (status != null && valvePinNumber != null) {
           this
               ._valves
-              .add(MqttValve(valve_pin_number, _valveStatusfromString(status)));
+              .add(MqttValve(valvePinNumber, _valveStatusfromString(status)));
         }
       }
     }

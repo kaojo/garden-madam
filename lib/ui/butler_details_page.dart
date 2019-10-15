@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:garden_madam/blocs/butler_feed.dart';
+import 'package:garden_madam/repositories/butler-repository.dart';
 import 'package:garden_madam/models/butler.dart';
 import 'package:garden_madam/models/pin.dart';
 import 'package:garden_madam/ui/valve_details_page.dart';
 
 class ButlerDetailsPage extends StatelessWidget {
   final Butler _butler;
-  final ButlerController _butlerController;
+  final ButlerRepository _butlerController;
 
   ButlerDetailsPage(this._butler, this._butlerController);
 
@@ -43,13 +43,13 @@ class ButlerDetailsPage extends StatelessWidget {
   }
 
   List<ValvesListItem> _getValves(Butler butler,
-      ButlerController butlerController) {
+      ButlerRepository butlerController) {
     return butler.pins != null
         ? butler.pins.map((pin) => _getValve(pin, butlerController)).toList()
         : [];
   }
 
-  ValvesListItem _getValve(Pin pin, ButlerController butlerController) {
+  ValvesListItem _getValve(Pin pin, ButlerRepository butlerController) {
     return ValvesListItem(butlerController, pin);
   }
 }

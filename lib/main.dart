@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:garden_madam/blocs/butler_feed.dart';
+import 'package:garden_madam/datahandlers/health_status_mqtt_client.dart';
+import 'package:garden_madam/datahandlers/layout_status_handler.dart';
+import 'package:garden_madam/datahandlers/schedule_status_handler.dart';
+import 'package:garden_madam/repositories/butler-repository.dart';
 import 'package:garden_madam/datahandlers/mqtt.dart';
+import 'package:mqtt_client/mqtt_client.dart';
 
 import 'models/butler.dart';
 import 'ui/butler_details_page.dart';
@@ -11,15 +15,27 @@ class MyApp extends StatelessWidget {
 // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    var butlerController = ButlerController(
-        "local",
-        "Local Development",
-        MqttConfig(
-            "mqtt.flespi.io",
-            8883,
-            "FlespiToken 2PytGtM3gJZWa4JmJy1cDYuTkeZAmubd7xwCP8vVFiFEcdQKBFM2r4JB8wZjOZmM",
-            "",
-            "garden_madam_dev"));
+    var mqttConfig = MqttConfig(
+        "mqtt.flespi.io",
+        8883,
+        "FlespiToken 2PytGtM3gJZWa4JmJy1cDYuTkeZAmubd7xwCP8vVFiFEcdQKBFM2r4JB8wZjOZmM",
+        "",
+        "garden_madam_dev");
+    var mqttClient = MqttClient.withPort(
+        mqttConfig.hostname, mqttConfig.client_id, mqttConfig.port);
+
+    var butlerController = ButlerRepository(
+      id: "local",
+      name: "local development",
+      mqttClient: mqttClient,
+      mqttConfig: mqttConfig,
+      butlerHealthStatusMqttClient:
+          ButlerHealthStatusMqttClient(mqttClient: mqttClient),
+      butlerLayoutStatusMqttClient:
+          ButlerLayoutStatusMqttClient(mqttClient: mqttClient),
+      butlerWateringScheduleStatusMqttClient:
+          ButlerWateringScheduleStatusMqttClient(mqttClient: mqttClient),
+    );
 
     return MaterialApp(
       title: 'Garden Madam',

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:garden_madam/blocs/butler_feed.dart';
+import 'package:garden_madam/repositories/butler-repository.dart';
 import 'package:garden_madam/models/pin.dart';
 
 
 class ValvesListItem extends StatelessWidget {
-  ButlerController _butlerController;
+  ButlerRepository _butlerController;
   Pin _pin;
 
   ValvesListItem(this._butlerController, this._pin);
