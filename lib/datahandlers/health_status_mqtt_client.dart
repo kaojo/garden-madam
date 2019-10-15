@@ -1,11 +1,8 @@
-import 'dart:collection';
-
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
 class ButlerHealthStatusMqttClient {
   final MqttClient mqttClient;
-  Map<String, MqttHealthStatus> _healthStatus = HashMap();
 
   ButlerHealthStatusMqttClient({@required this.mqttClient});
 
@@ -25,14 +22,6 @@ class ButlerHealthStatusMqttClient {
 
   void _subscribe(String deviceId) {
     mqttClient.subscribe(_getHealthStatusTopic(deviceId), MqttQos.exactlyOnce);
-    mqttClient.updates
-        .where((event) => _isHealthStatusMessage(event, deviceId))
-        .map((event) => _mapToHealthStatus(event, deviceId))
-        .listen((status) => _onData(status, deviceId));
-  }
-
-  void _onData(MqttHealthStatus healthStatus, String deviceId) {
-    _healthStatus[deviceId] = healthStatus;
   }
 
   bool _isHealthStatusMessage(
