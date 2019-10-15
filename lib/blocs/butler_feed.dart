@@ -17,10 +17,11 @@ class ButlerController {
   Butler _butler;
   MqttClient _mqttClient;
 
-  MqttLayoutStatus _mqttLayoutStatus;
-  MqttWateringSchedule _mqttWateringScheduleStatus;
   MqttConfig _mqttConfig;
   ButlerHealthStatusMqttClient _butlerHealthStatusMqttClient;
+  ButlerLayoutStatusMqttClient _butlerLayoutStatusMqttClient;
+  ButlerWateringScheduleStatusMqttClient
+      _butlerWateringScheduleStatusMqttClient;
 
   ButlerController(String id, String name, this._mqttConfig) {
     this._butler = Butler(id, name);
@@ -31,19 +32,15 @@ class ButlerController {
     this._mqttClient.onSubscribed = _onSubscribed;
     this._butlerHealthStatusMqttClient =
         ButlerHealthStatusMqttClient(mqttClient: _mqttClient);
+    this._butlerLayoutStatusMqttClient =
+        ButlerLayoutStatusMqttClient(mqttClient: _mqttClient);
+    this._butlerWateringScheduleStatusMqttClient =
+        ButlerWateringScheduleStatusMqttClient(mqttClient: _mqttClient);
     _connect();
   }
 
   Stream<Butler> get stream {
     return _streamController.stream;
-  }
-
-  String get _layoutStatusTopic {
-    return this._butler.id + '/garden-butler/status/layout';
-  }
-
-  String get _wateringScheduleStatusTopic {
-    return this._butler.id + '/garden-butler/status/watering-schedule';
   }
 
   String get _layoutOpenCommandTopic {
@@ -67,14 +64,53 @@ class ButlerController {
   Future subscribeToButlerStatusStreams(
       MqttClientConnectionStatus status) async {
     if (status != null && status.state == MqttConnectionState.connected) {
-      this._mqttClient.subscribe(_layoutStatusTopic, MqttQos.exactlyOnce);
       this
-          ._mqttClient
-          .subscribe(_wateringScheduleStatusTopic, MqttQos.exactlyOnce);
-      this._mqttClient.updates.listen(onStatusMessageReceived,
-          onError: (error) {
-        print(error);
-        this._streamController.addError(error);
+          ._butlerLayoutStatusMqttClient
+          .getLayoutStatus(this._butler.id)
+          .forEach((status) {
+        for (var valve in status.valves) {
+          var pin = this._butler.findPin(valve.valve_pin_number);
+          if (pin == null) {
+            pin = Pin(valve.valve_pin_number);
+            this._butler.addPin(pin);
+          }
+          var status;
+          switch (valve.status) {
+            case MqttValveStatus.OPEN:
+              status = Status.ON;
+              break;
+            case MqttValveStatus.CLOSED:
+              status = Status.OFF;
+              break;
+            case MqttValveStatus.UNKNOWN:
+              print('unknown valve status found');
+              status = Status.OFF;
+              break;
+          }
+          pin.status = status;
+        }
+        notifyChanges();
+      });
+
+      this
+          ._butlerWateringScheduleStatusMqttClient
+          .getWateringScheduleStatus(this._butler.id)
+          .forEach((status) {
+        for (var schedule in status.schedules) {
+          var pin = this._butler.findPin(schedule.valve);
+          if (pin == null) {
+            pin = Pin(schedule.valve);
+            this._butler.addPin(pin);
+          }
+
+          var cronExpression = schedule.schedule.cron_expression;
+          var durationSeconds = schedule.schedule.duration_seconds;
+          if (cronExpression != null && durationSeconds != null) {
+            pin.schedule = Schedule(cronExpression, durationSeconds,
+                enabled: status.enabled);
+          }
+        }
+        notifyChanges();
       });
 
       this
@@ -96,73 +132,6 @@ class ButlerController {
           ._streamController
           .addError("Could not subscribe to butler status topics.");
     }
-  }
-
-  void onStatusMessageReceived(List<MqttReceivedMessage<MqttMessage>> event) {
-    for (var messageWrapper in event) {
-      if (messageWrapper.topic == _layoutStatusTopic) {
-        MqttPublishMessage publishMessage = messageWrapper.payload;
-        var payload = MqttPublishPayload.bytesToStringAsString(
-            publishMessage.payload.message);
-        print(payload);
-
-        this._mqttLayoutStatus =
-            MqttLayoutStatus.fromJson(json.decode(payload));
-      }
-      if (messageWrapper.topic == _wateringScheduleStatusTopic) {
-        MqttPublishMessage publishMessage = messageWrapper.payload;
-        var payload = MqttPublishPayload.bytesToStringAsString(
-            publishMessage.payload.message);
-        print(payload);
-
-        this._mqttWateringScheduleStatus =
-            MqttWateringSchedule.fromJson(json.decode(payload));
-      }
-      _updateButler();
-    }
-  }
-
-  Future _updateButler() async {
-    if (this._mqttLayoutStatus != null) {
-      for (var valve in this._mqttLayoutStatus.valves) {
-        var pin = this._butler.findPin(valve.valve_pin_number);
-        if (pin == null) {
-          pin = Pin(valve.valve_pin_number);
-          this._butler.addPin(pin);
-        }
-        var status;
-        switch (valve.status) {
-          case MqttValveStatus.OPEN:
-            status = Status.ON;
-            break;
-          case MqttValveStatus.CLOSED:
-            status = Status.OFF;
-            break;
-          case MqttValveStatus.UNKNOWN:
-            print('unknown valve status found');
-            status = Status.OFF;
-            break;
-        }
-        pin.status = status;
-      }
-    }
-    if (this._mqttWateringScheduleStatus != null) {
-      for (var schedule in this._mqttWateringScheduleStatus.schedules) {
-        var pin = this._butler.findPin(schedule.valve);
-        if (pin == null) {
-          pin = Pin(schedule.valve);
-          this._butler.addPin(pin);
-        }
-
-        var cronExpression = schedule.schedule.cron_expression;
-        var durationSeconds = schedule.schedule.duration_seconds;
-        if (cronExpression != null && durationSeconds != null) {
-          pin.schedule = Schedule(cronExpression, durationSeconds,
-              enabled: this._mqttWateringScheduleStatus.enabled);
-        }
-      }
-    }
-    this._streamController.add(this._butler);
   }
 
   void notifyChanges() {

@@ -1,4 +1,56 @@
 import 'dart:collection';
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:mqtt_client/mqtt_client.dart';
+
+class ButlerLayoutStatusMqttClient {
+  final MqttClient mqttClient;
+
+  ButlerLayoutStatusMqttClient({@required this.mqttClient});
+
+  String _getLayoutStatusTopic(String deviceId) {
+    return '$deviceId/garden-butler/status/layout';
+  }
+
+  Stream<MqttLayoutStatus> getLayoutStatus(String deviceId) {
+    if (mqttClient.getSubscriptionsStatus(_getLayoutStatusTopic(deviceId)) ==
+        MqttSubscriptionStatus.doesNotExist) {
+      _subscribe(deviceId);
+    }
+    return mqttClient.updates
+        .where((event) => _isLayoutStatusMessage(event, deviceId))
+        .map((event) => _mapToHealthStatus(event, deviceId));
+  }
+
+  void _subscribe(String deviceId) {
+    mqttClient.subscribe(_getLayoutStatusTopic(deviceId), MqttQos.exactlyOnce);
+  }
+
+  bool _isLayoutStatusMessage(
+      List<MqttReceivedMessage<MqttMessage>> event, String deviceId) {
+    return event != null &&
+        event.isNotEmpty &&
+        event
+            .where((m) => m.topic == _getLayoutStatusTopic(deviceId))
+            .isNotEmpty;
+  }
+
+  MqttLayoutStatus _mapToHealthStatus(
+      List<MqttReceivedMessage<MqttMessage>> event, String deviceId) {
+    var messageWrapper =
+    event.firstWhere((m) => m.topic == _getLayoutStatusTopic(deviceId));
+
+    MqttPublishMessage publishMessage = messageWrapper.payload;
+    var payload = MqttPublishPayload.bytesToStringAsString(
+        publishMessage.payload.message);
+    print(payload);
+
+    var status =
+        MqttLayoutStatus.fromJson(json.decode(payload));
+    return status;
+  }
+}
 
 class MqttLayoutStatus {
   List<MqttValve> _valves;
