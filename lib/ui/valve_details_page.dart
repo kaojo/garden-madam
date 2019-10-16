@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:garden_madam/models/pin.dart';
+import 'package:garden_madam/models/models.dart';
+
 
 Icon _getScheduleIcon(Pin pin) {
   if (pin.schedule == null) {

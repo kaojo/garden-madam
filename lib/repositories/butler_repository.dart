@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:garden_madam/datahandlers/health_status_mqtt_client.dart';
-import 'package:garden_madam/datahandlers/layout_status_handler.dart';
-import 'package:garden_madam/datahandlers/schedule_status_handler.dart';
+import 'package:garden_madam/datahandlers/datahandlers.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
 import '../models/butler.dart';
@@ -25,6 +23,10 @@ class ButlerRepository {
     this.mqttClient.onConnected = _onConnected;
     this.mqttClient.onSubscribed = _onSubscribed;
     _connect();
+  }
+
+  Future<Butler> getButler() async {
+    return _butler;
   }
 
   Stream<Butler> get stream {

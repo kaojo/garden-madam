@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:garden_madam/repositories/butler-repository.dart';
-import 'package:garden_madam/models/butler.dart';
-import 'package:garden_madam/models/pin.dart';
+import 'package:garden_madam/models/models.dart';
+import 'package:garden_madam/repositories/butler_repository.dart';
 import 'package:garden_madam/ui/valve_details_page.dart';
 
 class ButlerDetailsPage extends StatelessWidget {
