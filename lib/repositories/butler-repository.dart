@@ -8,7 +8,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 import '../models/butler.dart';
 import '../models/pin.dart';
 import '../models/schedule.dart';
-import '../datahandlers/mqtt.dart';
+import '../mqtt.dart';
 
 class ButlerRepository {
   StreamController<Butler> _streamController = StreamController<Butler>();
@@ -105,7 +105,7 @@ class ButlerRepository {
         notifyChanges();
       });
     } else {
-      print('${status}');
+      print('$status');
       if (status != null) print('${status.state}');
       print(this.mqttClient.connectionStatus.returnCode);
       this
@@ -118,14 +118,14 @@ class ButlerRepository {
     this._streamController.add(this._butler);
   }
 
-  void turn_off(Pin pin) {
+  void turnOff(Pin pin) {
     this.butlerLayoutStatusMqttClient.turnOff(this._butler.id, pin.valvePinNumber);
 
     pin.status = Status.OFF;
     this.notifyChanges();
   }
 
-  void turn_on(Pin pin) {
+  void turnOn(Pin pin) {
     this.butlerLayoutStatusMqttClient.turnOn(this._butler.id, pin.valvePinNumber);
 
     pin.status = Status.ON;
@@ -152,7 +152,7 @@ class ButlerRepository {
         .timeout(Duration(seconds: 5))
         .then(subscribeToButlerStatusStreams)
         .catchError((error) {
-      print('Could not connect mqtt client: ${error}');
+      print('Could not connect mqtt client: $error');
       this._streamController.addError(error);
     });
   }

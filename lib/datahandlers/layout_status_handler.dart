@@ -110,6 +110,7 @@ class MqttLayoutStatus {
 }
 
 class MqttValve {
+  // ignore: non_constant_identifier_names
   final int valve_pin_number;
   final MqttValveStatus status;
 

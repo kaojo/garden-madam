@@ -89,7 +89,9 @@ class MqttValveSchedule {
 }
 
 class MqttSchedule {
+  // ignore: non_constant_identifier_names
   final String cron_expression;
+  // ignore: non_constant_identifier_names
   final int duration_seconds;
 
   MqttSchedule(this.cron_expression, this.duration_seconds);
