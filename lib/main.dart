@@ -1,4 +1,3 @@
-import 'package:dependencies_flutter/dependencies_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:garden_madam/datahandlers/health_status_mqtt_client.dart';
@@ -22,21 +21,17 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: MqttModule(
-        child: RepositoryProvider(
+      home: RepositoryProvider(
           builder: (context) => _buildButlerRepository("local", "Virtueller Dev Buttler", context),
           child: ButlerPage(),
         ),
-      ),
     );
   }
 
 }
 
 ButlerRepository _buildButlerRepository(String deviceId, String butlerName, BuildContext context) {
-  //final injector = InjectorWidget.of(context);
-//  final mqttClient = injector.get<MqttClient>();
-//  final mqttConfig = injector.get<MqttConfig>();
+  // TODO load mqtt config from local storage or something
   final mqttConfig = MqttConfig(
       "mqtt.flespi.io",
       8883,
