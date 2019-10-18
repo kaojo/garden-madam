@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:garden_madam/models/models.dart';
 
+import 'detail_image_composition.dart';
 
 Icon _getScheduleIcon(Pin pin) {
   if (pin.schedule == null) {
@@ -28,12 +29,12 @@ class ValvePage extends StatelessWidget {
       ),
       body: ListView(
         children: <Widget>[
-          Hero(
-            tag: _pin.valvePinNumber,
-            child: Container(
-              height: 200,
-              padding: const EdgeInsets.all(10.0),
-              color: Colors.grey[300],
+          DetailImageComposition(
+            status: _pin.status == Status.ON,
+            onColor: Colors.blue,
+            offColor: Colors.grey,
+            child: Hero(
+              tag: _pin.valvePinNumber,
               child: SvgPicture.asset(
                 'images/' +
                     (_pin.imageName != null ? _pin.imageName : 'valve_1.svg'),
