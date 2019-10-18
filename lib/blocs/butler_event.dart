@@ -1,16 +1,18 @@
 
 
+import 'package:garden_madam/models/models.dart';
+
 abstract class ButlerEvent {
   const ButlerEvent();
 }
 
 class FetchButler extends ButlerEvent {}
 
-class ToggleValve extends ButlerEvent {
-  final int pinValveNumber;
+class ToggleValveEvent extends ButlerEvent {
+  final Pin pin;
   final ToggleDirection toggleDirection;
 
-  ToggleValve(this.pinValveNumber, this.toggleDirection);
+  ToggleValveEvent({this.pin, this.toggleDirection});
 }
 
 enum ToggleDirection {

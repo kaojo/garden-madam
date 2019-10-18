@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:typed_data/typed_data.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,6 @@ class ButlerLayoutStatusMqttClient {
   String _layoutCloseCommandTopic(String deviceId) {
     return '$deviceId/garden-butler/command/layout/close';
   }
-
 
   Stream<MqttLayoutStatus> getLayoutStatus(String deviceId) {
     if (mqttClient.getSubscriptionsStatus(_getLayoutStatusTopic(deviceId)) ==
@@ -49,28 +49,30 @@ class ButlerLayoutStatusMqttClient {
   MqttLayoutStatus _mapToHealthStatus(
       List<MqttReceivedMessage<MqttMessage>> event, String deviceId) {
     var messageWrapper =
-    event.firstWhere((m) => m.topic == _getLayoutStatusTopic(deviceId));
+        event.firstWhere((m) => m.topic == _getLayoutStatusTopic(deviceId));
 
     MqttPublishMessage publishMessage = messageWrapper.payload;
     var payload = MqttPublishPayload.bytesToStringAsString(
         publishMessage.payload.message);
     print(payload);
 
-    var status =
-        MqttLayoutStatus.fromJson(json.decode(payload));
+    var status = MqttLayoutStatus.fromJson(json.decode(payload));
     return status;
   }
 
-  void turnOff(String deviceId, int valvePinNumber) {
+  Future<Void> turnOff(String deviceId, int valvePinNumber) async {
     Uint8Buffer buffer = _convertPinNumberToPayload(valvePinNumber);
     this.mqttClient.publishMessage(
         _layoutCloseCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
+    return Void();
   }
 
-  void turnOn(String deviceId, int valvePinNumber) {
+  Future<Void> turnOn(String deviceId, int valvePinNumber) async {
     Uint8Buffer buffer = _convertPinNumberToPayload(valvePinNumber);
     this.mqttClient.publishMessage(
         _layoutOpenCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
+
+    return Void();
   }
 
   Uint8Buffer _convertPinNumberToPayload(int valvePinNumber) {
@@ -79,7 +81,6 @@ class ButlerLayoutStatusMqttClient {
     buffer.addAll(data);
     return buffer;
   }
-
 }
 
 class MqttLayoutStatus {
@@ -107,6 +108,13 @@ class MqttLayoutStatus {
       }
     }
   }
+
+  @override
+  String toString() {
+    return 'MqttLayoutStatus{_valves: $_valves}';
+  }
+
+
 }
 
 class MqttValve {
@@ -115,6 +123,13 @@ class MqttValve {
   final MqttValveStatus status;
 
   MqttValve(this.valve_pin_number, this.status);
+
+  @override
+  String toString() {
+    return 'MqttValve{valve_pin_number: $valve_pin_number, status: $status}';
+  }
+
+
 }
 
 enum MqttValveStatus {

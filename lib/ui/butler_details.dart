@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:garden_madam/blocs/blocs.dart';
 import 'package:garden_madam/models/models.dart';
-import 'package:garden_madam/repositories/butler_repository.dart';
 import 'package:garden_madam/ui/valve_details_page.dart';
 
 class ButlerDetailsPage extends StatelessWidget {
@@ -15,29 +15,29 @@ class ButlerDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     print('building butler detail widget');
     return ListView(
-        children: <Widget>[
-          Container(
-              color: Colors.grey[300],
-              margin: EdgeInsets.only(bottom: 10),
-              child: Center(
-                child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          width: 10,
-                          color: _butler.online ? Colors.green : Colors.red),
-                      borderRadius: BorderRadius.circular(200),
-                    ),
-                    margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                    width: 200,
-                    height: 200,
-                    alignment: Alignment.center,
-                    child: SvgPicture.asset('images/butler.svg',
-                        semanticsLabel: 'Butler default image'),
-                  ),
-                ),
+      children: <Widget>[
+        Container(
+          color: Colors.grey[300],
+          margin: EdgeInsets.only(bottom: 10),
+          child: Center(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                    width: 10,
+                    color: _butler.online ? Colors.green : Colors.red),
+                borderRadius: BorderRadius.circular(200),
               ),
-              ..._getValves(_butler)
-        ],
+              margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+              width: 200,
+              height: 200,
+              alignment: Alignment.center,
+              child: SvgPicture.asset('images/butler.svg',
+                  semanticsLabel: 'Butler default image'),
+            ),
+          ),
+        ),
+        ..._getValves(_butler)
+      ],
     );
   }
 
@@ -52,7 +52,6 @@ class ButlerDetailsPage extends StatelessWidget {
   }
 }
 
-
 class ValvesListItem extends StatelessWidget {
   final Pin _pin;
 
@@ -64,8 +63,8 @@ class ValvesListItem extends StatelessWidget {
       onTap: () {
         Navigator.push(context,
             MaterialPageRoute(builder: (BuildContext context) {
-              return ValvePage(_pin);
-            }));
+          return ValvePage(_pin);
+        }));
       },
       contentPadding: EdgeInsets.only(left: 10, bottom: 20.0),
       leading: Container(
@@ -93,9 +92,26 @@ class ValvesListItem extends StatelessWidget {
       ),
       trailing: Switch(
         value: _pin.status == Status.ON,
-        onChanged: togglePin(context, _pin),
+        onChanged: (newValue) => togglePin(context, _pin, newValue),
       ),
     );
+  }
+
+  togglePin(BuildContext context, Pin pin, bool newValue) {
+    var butlerBloc = BlocProvider.of<ButlerBloc>(context);
+    try {
+      var direction;
+      if (_pin.status == Status.ON) {
+        direction = ToggleDirection.off;
+      } else {
+        direction = ToggleDirection.on;
+      }
+      butlerBloc
+          .dispatch(ToggleValveEvent(pin: pin, toggleDirection: direction));
+    } on Exception catch (e) {
+      print(e);
+      handleMqttError(context, _pin, newValue);
+    }
   }
 
   void handleMqttError(BuildContext context, Pin pin, bool newValue) {
@@ -121,18 +137,4 @@ class ValvesListItem extends StatelessWidget {
     );
   }
 
-  togglePin(BuildContext context, Pin pin) => (bool newValue) {
-    var butlerController = RepositoryProvider.of<ButlerRepository>(context);
-    try {
-      if (_pin.status == Status.ON) {
-        butlerController.turnOff(_pin);
-      } else {
-        butlerController.turnOn(_pin);
-      }
-    } on Exception catch (e) {
-      print(e);
-      handleMqttError(context, _pin, newValue);
-    }
-
-  };
 }

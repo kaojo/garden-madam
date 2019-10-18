@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:garden_madam/blocs/blocs.dart';
-import 'package:garden_madam/repositories/butler_repository.dart';
 
 import 'butler_details.dart';
 

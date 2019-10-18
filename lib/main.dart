@@ -11,6 +11,8 @@ import 'package:mqtt_client/mqtt_client.dart';
 
 import 'package:bloc/bloc.dart';
 
+import 'models/models.dart';
+
 class SimpleBlocDelegate extends BlocDelegate {
   @override
   onTransition(Bloc bloc, Transition transition) {
@@ -36,13 +38,15 @@ class MyApp extends StatelessWidget {
       ),
       home: RepositoryProvider(
         builder: (context) {
-          return _buildButlerRepository("local", butlerName, context);
+          ButlerRepository butlerRepository = _buildButlerRepository(context);
+          butlerRepository.connect(Butler("local", butlerName));
+          return butlerRepository;
         },
         child: BlocProvider(
           builder: (context) {
             var bloc = ButlerBloc(
-              butlerRepository:
-                  RepositoryProvider.of<ButlerRepository>(context));
+                butlerRepository:
+                    RepositoryProvider.of<ButlerRepository>(context));
             bloc.dispatch(FetchButler());
             return bloc;
           },
@@ -53,8 +57,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-ButlerRepository _buildButlerRepository(
-    String deviceId, String butlerName, BuildContext context) {
+ButlerRepository _buildButlerRepository(BuildContext context) {
   // TODO load mqtt config from local storage or something
   final mqttConfig = MqttConfig(
       "mqtt.flespi.io",
@@ -66,8 +69,6 @@ ButlerRepository _buildButlerRepository(
       mqttConfig.hostname, mqttConfig.client_id, mqttConfig.port);
 
   return ButlerRepository(
-    id: deviceId,
-    name: butlerName,
     mqttClient: mqttClient,
     mqttConfig: mqttConfig,
     butlerHealthStatusMqttClient:

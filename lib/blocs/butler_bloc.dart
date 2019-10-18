@@ -29,6 +29,17 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
       } catch (_) {
         yield ButlerError();
       }
+    } else if (event is ToggleValveEvent) {
+      print("toggle event received");
+      Butler butler;
+      if (event.toggleDirection == ToggleDirection.on) {
+        butler = await butlerRepository.turnOnWithRetry(event.pin);
+      } else {
+        butler = await butlerRepository.turnOffWithRetry(event.pin);
+      }
+      print(butler);
+      print("toggle event done yield it.");
+      yield ButlerLoaded(butler: butler);
     }
   }
 }

@@ -19,6 +19,14 @@ class Pin {
       return "Pin " + valvePinNumber.toString();
     }
   }
+
+  void turnOff() {
+    status = Status.OFF;
+  }
+
+  void turnOn() {
+    status = Status.ON;
+  }
 }
 
 enum Status { ON, OFF }
