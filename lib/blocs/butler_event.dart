@@ -6,7 +6,7 @@ abstract class ButlerEvent {
   const ButlerEvent();
 }
 
-class FetchButler extends ButlerEvent {}
+class LoadButler extends ButlerEvent {}
 class RefreshButler extends ButlerEvent {}
 
 class ToggleValveEvent extends ButlerEvent {

@@ -13,7 +13,8 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
       : assert(butlerRepository != null);
 
   void init() {
-    dispatch(FetchButler());
+    dispatch(LoadButler());
+    _refreshButlerOnUpdatesReceived();
   }
 
   @override
@@ -21,7 +22,7 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
 
   @override
   Stream<ButlerState> mapEventToState(ButlerEvent event) async* {
-    if (event is FetchButler) {
+    if (event is LoadButler) {
       yield ButlerLoading();
       try {
         final Butler butler = await butlerRepository.getButler();
@@ -53,5 +54,11 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
         yield ButlerError();
       }
     }
+  }
+
+  void _refreshButlerOnUpdatesReceived() {
+    butlerRepository
+        .butlerUpdatedStream()
+        .listen((_) => dispatch(RefreshButler()));
   }
 }

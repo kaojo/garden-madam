@@ -31,13 +31,10 @@ class ButlerPageWrapper extends StatelessWidget {
       },
       child: BlocProvider(
         builder: (context) {
-          var butlerRepository =
-              RepositoryProvider.of<ButlerRepository>(context);
-          var bloc = ButlerBloc(butlerRepository: butlerRepository);
+          var bloc = ButlerBloc(
+            butlerRepository: RepositoryProvider.of<ButlerRepository>(context),
+          );
           bloc.init();
-          butlerRepository
-              .butlerUpdatedStream()
-              .listen((_) => bloc.dispatch(RefreshButler()));
           return bloc;
         },
         child: ButlerPage(butlerName),

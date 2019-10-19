@@ -22,26 +22,31 @@ class ButlerPage extends StatelessWidget {
               return ListView(
                 children: <Widget>[
                   Text('Error'),
-                ],);
+                ],
+              );
             } else if (state is ButlerLoaded) {
               return ButlerDetailsPage(state.butler);
             } else if (state is ButlerLoading) {
-              return _getLoadingPage();
+              return _loadingAnimation();
             } else {
               return ListView(
                 children: <Widget>[
                   Text('No Data'),
-                ],);
+                ],
+              );
             }
           },
         ),
-        onRefresh: () async => BlocProvider.of<ButlerBloc>(context).dispatch(FetchButler()),
+        onRefresh: () async => _loadButler(context),
       ),
     );
   }
+
+  void _loadButler(BuildContext context) =>
+      BlocProvider.of<ButlerBloc>(context).dispatch(LoadButler());
 }
 
-Center _getLoadingPage() {
+Widget _loadingAnimation() {
   return new Center(
     child: new CircularProgressIndicator(),
   );
