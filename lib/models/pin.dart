@@ -27,6 +27,10 @@ class Pin {
   void turnOn() {
     status = Status.ON;
   }
+
+  bool isTurnedOn() {
+    return status == Status.ON;
+  }
 }
 
 enum Status { ON, OFF }

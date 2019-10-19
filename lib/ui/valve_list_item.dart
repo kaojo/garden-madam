@@ -52,24 +52,42 @@ class ValvesListItem extends StatelessWidget {
   }
 
   togglePin(BuildContext context, Pin pin, bool newValue) {
-    var butlerBloc = BlocProvider.of<ButlerBloc>(context);
     try {
-      var direction;
-      if (_pin.status == Status.ON) {
-        direction = ToggleDirection.off;
-      } else {
-        direction = ToggleDirection.on;
-      }
-      butlerBloc
-          .dispatch(ToggleValveEvent(pin: pin, toggleDirection: direction));
+      ToggleValveEvent toggleValveEvent = _createToggleEvent(pin);
+      _dispatchEvent(context, toggleValveEvent);
     } on Exception catch (e) {
-      print(e);
-      handleMqttError(context, _pin, newValue);
+      _handleToggleError(context, _pin, newValue, e);
     }
   }
 
-  void handleMqttError(BuildContext context, Pin pin, bool newValue) {
-    pin.status = newValue ? Status.OFF : Status.ON;
+  void _dispatchEvent(BuildContext context, ButlerEvent event) {
+    var butlerBloc = BlocProvider.of<ButlerBloc>(context);
+    butlerBloc.dispatch(event);
+  }
+
+  ToggleValveEvent _createToggleEvent(Pin pin) {
+    var direction = _determineToggleDirection();
+    return ToggleValveEvent(pin: pin, toggleDirection: direction);
+  }
+
+  _determineToggleDirection() {
+    var direction;
+    if (_pin.isTurnedOn()) {
+      direction = ToggleDirection.off;
+    } else {
+      direction = ToggleDirection.on;
+    }
+    return direction;
+  }
+
+  void _handleToggleError(
+      BuildContext context, Pin pin, bool newValue, Exception e) {
+    print(e);
+    _restoreOldPinStatus(pin, newValue);
+    _displayErrorDialog(context);
+  }
+
+  void _displayErrorDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -89,5 +107,9 @@ class ValvesListItem extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _restoreOldPinStatus(Pin pin, bool newValue) {
+    pin.status = newValue ? Status.OFF : Status.ON;
   }
 }
