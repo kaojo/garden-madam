@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:garden_madam/datahandlers/datahandlers.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
@@ -12,21 +13,21 @@ class ButlerRepository {
   Butler _butler;
   final MqttClient mqttClient;
   final MqttConfig mqttConfig;
-  final ButlerHealthStatusMqttClient butlerHealthStatusMqttClient;
-  final ButlerLayoutStatusMqttClient butlerLayoutStatusMqttClient;
+  final ButlerHealthStatusMqttClient _butlerHealthStatusMqttClient;
+  final ButlerLayoutStatusMqttClient _butlerLayoutStatusMqttClient;
   final ButlerWateringScheduleStatusMqttClient
-      butlerWateringScheduleStatusMqttClient;
+      _butlerWateringScheduleStatusMqttClient;
+  final StreamController<Butler> _butlerUpdated = StreamController();
 
-  ButlerRepository(
-      {this.mqttConfig,
-      this.mqttClient,
-      this.butlerHealthStatusMqttClient,
-      this.butlerLayoutStatusMqttClient,
-      this.butlerWateringScheduleStatusMqttClient}) {
-    this.mqttClient.secure = true;
-    this.mqttClient.onConnected = _onConnected;
-    this.mqttClient.onSubscribed = _onSubscribed;
-  }
+  ButlerRepository({
+    @required this.mqttConfig,
+    @required this.mqttClient,
+  })  : _butlerHealthStatusMqttClient =
+            ButlerHealthStatusMqttClient(mqttClient: mqttClient),
+        _butlerLayoutStatusMqttClient =
+            ButlerLayoutStatusMqttClient(mqttClient: mqttClient),
+        _butlerWateringScheduleStatusMqttClient =
+            ButlerWateringScheduleStatusMqttClient(mqttClient: mqttClient);
 
   void connect(Butler butler) {
     this._butler = butler;
@@ -61,7 +62,7 @@ class ButlerRepository {
 
   Future<Butler> doTurnOff(Pin pin) async {
     await this
-        .butlerLayoutStatusMqttClient
+        ._butlerLayoutStatusMqttClient
         .turnOff(this._butler.id, pin.valvePinNumber)
         .then((_) => pin.turnOff());
     return _butler;
@@ -69,46 +70,50 @@ class ButlerRepository {
 
   Future<Butler> doTurnOn(Pin pin) async {
     await this
-        .butlerLayoutStatusMqttClient
+        ._butlerLayoutStatusMqttClient
         .turnOn(this._butler.id, pin.valvePinNumber)
         .then((_) => pin.turnOn());
     return _butler;
   }
 
-  void _onConnected() {
-    print("connected successful");
+  Future<void> refresh() async {
+    print('refresh');
+    if (this.mqttClient.connectionStatus == null ||
+        this.mqttClient.connectionStatus.state !=
+            MqttConnectionState.connected) {
+      print('try reconnect');
+      return _connect();
+    }
   }
 
-  void _onSubscribed(String topic) {
-    print('Subscription confirmed for topic $topic');
-  }
-
-  Future subscribeToButlerStatusStreams(
+  Future _subscribeToButlerStatusStreams(
       MqttClientConnectionStatus status) async {
     if (_mqttClientIsConnected(status)) {
       this
-          .butlerLayoutStatusMqttClient
+          ._butlerLayoutStatusMqttClient
           .getLayoutStatus(this._butler.id)
           .forEach(_updateFromLayoutStatus);
 
       this
-          .butlerWateringScheduleStatusMqttClient
+          ._butlerWateringScheduleStatusMqttClient
           .getWateringScheduleStatus(this._butler.id)
           .forEach(_updateFromScheduleStatus);
 
       this
-          .butlerHealthStatusMqttClient
+          ._butlerHealthStatusMqttClient
           .getHealthStatus(this._butler.id)
           .forEach(_updateFromHealthStatus);
     } else {
-      print('Error detected. Subscription to mqtt topics attempted on a invalid connection.');
+      print(
+          'Error detected. Subscription to mqtt topics attempted on a invalid connection.');
       print('$status');
       if (status != null) print('${status.state}');
       print(this.mqttClient.connectionStatus.returnCode);
     }
   }
 
-  bool _mqttClientIsConnected(MqttClientConnectionStatus status) => status != null && status.state == MqttConnectionState.connected;
+  bool _mqttClientIsConnected(MqttClientConnectionStatus status) =>
+      status != null && status.state == MqttConnectionState.connected;
 
   void _updateFromHealthStatus(status) {
     if (status == MqttHealthStatus.online) {
@@ -116,6 +121,7 @@ class ButlerRepository {
     } else {
       this._butler.online = false;
     }
+    _butlerWasUpdated();
   }
 
   void _updateFromScheduleStatus(status) {
@@ -133,6 +139,7 @@ class ButlerRepository {
             Schedule(cronExpression, durationSeconds, enabled: status.enabled);
       }
     }
+    _butlerWasUpdated();
   }
 
   void _updateFromLayoutStatus(status) {
@@ -157,16 +164,11 @@ class ButlerRepository {
       }
       pin.status = status;
     }
+    _butlerWasUpdated();
   }
 
-  Future<void> refresh() async {
-    print('refresh');
-    if (this.mqttClient.connectionStatus == null ||
-        this.mqttClient.connectionStatus.state !=
-            MqttConnectionState.connected) {
-      print('try reconnect');
-      return _connect();
-    }
+  void _butlerWasUpdated() {
+    _butlerUpdated.add(_butler);
   }
 
   Future<void> _connect() {
@@ -175,6 +177,10 @@ class ButlerRepository {
         .mqttClient
         .connect(mqttConfig.username, mqttConfig.password)
         .timeout(Duration(seconds: 5))
-        .then(subscribeToButlerStatusStreams);
+        .then(_subscribeToButlerStatusStreams);
+  }
+
+  Stream<Butler> butlerUpdatedStream() {
+    return _butlerUpdated.stream;
   }
 }

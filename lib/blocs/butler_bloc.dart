@@ -12,6 +12,10 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
   ButlerBloc({@required this.butlerRepository})
       : assert(butlerRepository != null);
 
+  void init() {
+    dispatch(FetchButler());
+  }
+
   @override
   ButlerState get initialState => ButlerEmpty();
 
@@ -30,16 +34,24 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
         yield ButlerError();
       }
     } else if (event is ToggleValveEvent) {
-      print("toggle event received");
       Butler butler;
       if (event.toggleDirection == ToggleDirection.on) {
         butler = await butlerRepository.turnOnWithRetry(event.pin);
       } else {
         butler = await butlerRepository.turnOffWithRetry(event.pin);
       }
-      print(butler);
-      print("toggle event done yield it.");
       yield ButlerLoaded(butler: butler);
+    } else if (event is RefreshButler) {
+      try {
+        final Butler butler = await butlerRepository.getButler();
+        if (butler == null) {
+          yield ButlerEmpty();
+        } else {
+          yield ButlerLoaded(butler: butler);
+        }
+      } catch (_) {
+        yield ButlerError();
+      }
     }
   }
 }

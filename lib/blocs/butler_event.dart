@@ -7,6 +7,7 @@ abstract class ButlerEvent {
 }
 
 class FetchButler extends ButlerEvent {}
+class RefreshButler extends ButlerEvent {}
 
 class ToggleValveEvent extends ButlerEvent {
   final Pin pin;
