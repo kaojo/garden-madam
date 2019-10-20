@@ -129,7 +129,6 @@ class MqttValve {
     return 'MqttValve{valve_pin_number: $valve_pin_number, status: $status}';
   }
 
-
 }
 
 enum MqttValveStatus {

@@ -4,8 +4,6 @@ import 'package:garden_madam/models/schedule.dart';
 class Pin {
   String _name;
   final int valvePinNumber;
-  int buttonPinNumber;
-  int statusPinNumber;
   Status status = Status.OFF;
   Schedule schedule;
   String imageName;

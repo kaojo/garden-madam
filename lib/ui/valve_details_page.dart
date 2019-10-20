@@ -43,21 +43,8 @@ class ValvePage extends StatelessWidget {
             title: TextField(
               enabled: false,
               decoration: InputDecoration(labelText: "Valve Pin"),
-              controller: TextEditingController(text: pin.valvePinNumber.toString()),
-            ),
-          ),
-          ListTile(
-            title: TextField(
-              enabled: false,
-              decoration: InputDecoration(labelText: "Button Pin"),
-              controller: TextEditingController(text: pin.buttonPinNumber != null ? pin.buttonPinNumber.toString() : ""),
-            ),
-          ),
-          ListTile(
-            title: TextField(
-              enabled: false,
-              decoration: InputDecoration(labelText: "Status LED Pin"),
-              controller: TextEditingController(text: pin.statusPinNumber != null ? pin.statusPinNumber.toString() : ""),
+              controller:
+                  TextEditingController(text: pin.valvePinNumber.toString()),
             ),
           ),
         ],
