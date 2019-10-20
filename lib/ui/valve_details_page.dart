@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:garden_madam/models/models.dart';
-
-import 'detail_image_composition.dart';
+import 'package:garden_madam/ui/valve_detail_image_composition.dart';
+import 'package:garden_madam/ui/valve_switch.dart';
 
 Icon _getScheduleIcon(Pin pin) {
   if (pin.schedule == null) {
@@ -17,29 +16,48 @@ Icon _getScheduleIcon(Pin pin) {
 }
 
 class ValvePage extends StatelessWidget {
-  final Pin _pin;
+  final Pin pin;
 
-  ValvePage(this._pin);
+  const ValvePage({Key key, this.pin}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_pin.name()),
+        title: Text(pin.name()),
+        actions: <Widget>[
+          ValveSwitch(pin),
+        ],
       ),
       body: ListView(
         children: <Widget>[
-          DetailImageComposition(
-            status: _pin.status == Status.ON,
-            onColor: Colors.blue,
-            offColor: Colors.grey,
-            child: Hero(
-              tag: _pin.valvePinNumber,
-              child: SvgPicture.asset(
-                'images/' +
-                    (_pin.imageName != null ? _pin.imageName : 'valve_1.svg'),
-                semanticsLabel: 'Valve default image',
-              ),
+          ValveDetailImageComposition(pin: pin),
+          ListTile(
+            title: TextField(
+              enabled: false,
+              decoration: InputDecoration(labelText: "Name"),
+              controller: TextEditingController(text: pin.name()),
+            ),
+          ),
+          ListTile(
+            title: TextField(
+              enabled: false,
+              decoration: InputDecoration(labelText: "Valve Pin"),
+              controller: TextEditingController(text: pin.valvePinNumber.toString()),
+            ),
+          ),
+          ListTile(
+            title: TextField(
+              enabled: false,
+              decoration: InputDecoration(labelText: "Button Pin"),
+              controller: TextEditingController(text: pin.buttonPinNumber != null ? pin.buttonPinNumber.toString() : ""),
+            ),
+          ),
+          ListTile(
+            title: TextField(
+              enabled: false,
+              decoration: InputDecoration(labelText: "Status LED Pin"),
+              controller: TextEditingController(text: pin.statusPinNumber != null ? pin.statusPinNumber.toString() : ""),
             ),
           ),
         ],

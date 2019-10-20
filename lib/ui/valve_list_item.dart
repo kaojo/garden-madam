@@ -3,8 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:garden_madam/blocs/blocs.dart';
 import 'package:garden_madam/models/models.dart';
+import 'package:garden_madam/ui/valve_page_wrapper.dart';
 
-import 'valve_details_page.dart';
+import 'valve_switch.dart';
 
 class ValvesListItem extends StatelessWidget {
   final Pin _pin;
@@ -15,9 +16,10 @@ class ValvesListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
+        var butlerBloc = BlocProvider.of<ButlerBloc>(context);
         Navigator.push(context,
-            MaterialPageRoute(builder: (BuildContext context) {
-          return ValvePage(_pin);
+            MaterialPageRoute(builder: (BuildContext newContext) {
+          return ValvePageWrapper(pin: _pin, butlerBloc: butlerBloc,);
         }));
       },
       contentPadding: EdgeInsets.only(left: 10, bottom: 20.0),
@@ -44,72 +46,7 @@ class ValvesListItem extends StatelessWidget {
         _pin.name(),
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
-      trailing: Switch(
-        value: _pin.status == Status.ON,
-        onChanged: (newValue) => togglePin(context, _pin, newValue),
-      ),
+      trailing: ValveSwitch(_pin),
     );
-  }
-
-  togglePin(BuildContext context, Pin pin, bool newValue) {
-    try {
-      ToggleValveEvent toggleValveEvent = _createToggleEvent(pin);
-      _dispatchEvent(context, toggleValveEvent);
-    } on Exception catch (e) {
-      _handleToggleError(context, _pin, newValue, e);
-    }
-  }
-
-  void _dispatchEvent(BuildContext context, ButlerEvent event) {
-    var butlerBloc = BlocProvider.of<ButlerBloc>(context);
-    butlerBloc.dispatch(event);
-  }
-
-  ToggleValveEvent _createToggleEvent(Pin pin) {
-    var direction = _determineToggleDirection();
-    return ToggleValveEvent(pin: pin, toggleDirection: direction);
-  }
-
-  _determineToggleDirection() {
-    var direction;
-    if (_pin.isTurnedOn()) {
-      direction = ToggleDirection.off;
-    } else {
-      direction = ToggleDirection.on;
-    }
-    return direction;
-  }
-
-  void _handleToggleError(
-      BuildContext context, Pin pin, bool newValue, Exception e) {
-    print(e);
-    _restoreOldPinStatus(pin, newValue);
-    _displayErrorDialog(context);
-  }
-
-  void _displayErrorDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Connection Error"),
-          content: new Text("Could not reach your butler. Try again later."),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _restoreOldPinStatus(Pin pin, bool newValue) {
-    pin.status = newValue ? Status.OFF : Status.ON;
   }
 }
