@@ -43,7 +43,7 @@ class ValvesListItem extends StatelessWidget {
         ),
       ),
       title: Text(
-        _pin.name(),
+        _pin.displayName(),
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       trailing: ValveSwitch(_pin),

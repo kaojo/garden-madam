@@ -24,7 +24,7 @@ class ValvePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(pin.name()),
+        title: Text(pin.displayName()),
         actions: <Widget>[
           ValveSwitch(pin),
         ],
@@ -36,7 +36,7 @@ class ValvePage extends StatelessWidget {
             title: TextField(
               enabled: false,
               decoration: InputDecoration(labelText: "Name"),
-              controller: TextEditingController(text: pin.name()),
+              controller: TextEditingController(text: pin.name),
             ),
           ),
           ListTile(

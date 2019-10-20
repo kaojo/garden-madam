@@ -2,7 +2,7 @@
 import 'package:garden_madam/models/schedule.dart';
 
 class Pin {
-  String _name;
+  String name;
   final int valvePinNumber;
   Status status = Status.OFF;
   Schedule schedule;
@@ -10,9 +10,9 @@ class Pin {
 
   Pin(this.valvePinNumber);
 
-  String name() {
-    if (_name != null && _name != "") {
-      return _name;
+  String displayName() {
+    if (name != null && name != "") {
+      return name;
     } else {
       return "Pin " + valvePinNumber.toString();
     }
