@@ -16,19 +16,15 @@ class ValvesListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () {
-        var butlerBloc = BlocProvider.of<ButlerBloc>(context);
-        Navigator.push(context,
-            MaterialPageRoute(builder: (BuildContext newContext) {
-          return ValvePageWrapper(pin: _pin, butlerBloc: butlerBloc,);
-        }));
-      },
+      onTap: () => navigateToValvePage(context),
       contentPadding: EdgeInsets.only(left: 10, bottom: 20.0),
       leading: Container(
         decoration: BoxDecoration(
           border: Border.all(
               width: 4,
-              color: _pin.status == Status.ON ? VALVE_ACTIVE_COLOR : VALVE_INACTIVE_COLOR),
+              color: _pin.status == Status.ON
+                  ? VALVE_ACTIVE_COLOR
+                  : VALVE_INACTIVE_COLOR),
           borderRadius: BorderRadius.circular(45),
         ),
         padding: EdgeInsets.all(5),
@@ -47,7 +43,23 @@ class ValvesListItem extends StatelessWidget {
         _pin.displayName(),
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
-      trailing: ValveSwitch(_pin),
+      trailing: Container(
+        child: IconButton(
+          onPressed: () => navigateToValvePage(context),
+          icon: Icon(Icons.arrow_forward),
+        ),
+      ),
     );
+  }
+
+  navigateToValvePage(BuildContext context) {
+    var butlerBloc = BlocProvider.of<ButlerBloc>(context);
+    Navigator.push(context,
+        MaterialPageRoute(builder: (BuildContext newContext) {
+          return ValvePageWrapper(
+            pin: _pin,
+            butlerBloc: butlerBloc,
+          );
+        }));
   }
 }

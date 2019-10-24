@@ -1,9 +1,10 @@
-import 'dart:math';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden_madam/models/models.dart';
 import 'package:garden_madam/ui/valve_detail_image_composition.dart';
 import 'package:garden_madam/ui/valve_switch.dart';
+
+import 'theme.dart';
 
 class ValvePage extends StatelessWidget {
   final Pin pin;
@@ -19,44 +20,56 @@ class ValvePage extends StatelessWidget {
       body: ListView(
         children: <Widget>[
           ValveDetailImageComposition(pin: pin),
+          ListTile(
+            leading: ValveSwitch(pin),
+            title: Text("On/Off", style: TextStyle(fontWeight: FontWeight.bold),),
+            trailing: Text("29:04"),
+          ),
+          Divider(
+            thickness: 2.0,
+          ),
           Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ValveSwitch(pin),
-                _getScheduleIcon(pin),
-              ],
+            alignment: Alignment.center,
+            child: Text(
+              "Schedules",
+              textScaleFactor: 1.5,
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           ListTile(
-            title: TextField(
-              enabled: false,
-              decoration: InputDecoration(labelText: "Name"),
-              controller: TextEditingController(text: pin.name),
+            leading: Switch(
+              value: false,
+              onChanged: (bool newValue) {
+                // Add your onChanged code here!
+              },
             ),
+            title: Text("17:00 - 18:00"),
+            trailing: IconButton(icon: Icon(Icons.delete, color: Colors.grey)),
           ),
           ListTile(
-            title: TextField(
-              enabled: false,
-              decoration: InputDecoration(labelText: "Valve Pin"),
-              controller:
-                  TextEditingController(text: pin.valvePinNumber.toString()),
+            title: RaisedButton(
+              onPressed: () {
+                // Do stuff
+              },
+              child: Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.add_circle_outline,
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 5.0),
+                      child: Text("Add Schedule"),
+                    ),
+                  ],
+                ),
+              ),
+              color: APPBAR_COLOR,
             ),
           ),
         ],
       ),
     );
   }
-}
-
-Icon _getScheduleIcon(Pin pin) {
-  if (pin.schedule == null) {
-    return Icon(Icons.add_alarm, color: Colors.grey);
-  }
-
-  if (!pin.schedule.enabled) {
-    return Icon(Icons.access_alarm, color: Colors.grey);
-  }
-
-  return Icon(Icons.access_alarm, color: Colors.lightBlueAccent);
 }
