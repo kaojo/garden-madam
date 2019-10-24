@@ -23,7 +23,7 @@ class ValvePage extends StatelessWidget {
           ListTile(
             leading: ValveSwitch(pin),
             title: Text("On/Off", style: TextStyle(fontWeight: FontWeight.bold),),
-            trailing: Text("29:04"),
+            trailing: Text("00:00:00"),
           ),
           Divider(
             thickness: 2.0,
@@ -44,6 +44,16 @@ class ValvePage extends StatelessWidget {
               },
             ),
             title: Text("17:00 - 18:00"),
+            trailing: IconButton(icon: Icon(Icons.delete, color: Colors.grey)),
+          ),
+          ListTile(
+            leading: Switch(
+              value: true,
+              onChanged: (bool newValue) {
+                // Add your onChanged code here!
+              },
+            ),
+            title: Text("09:00 - 09:30"),
             trailing: IconButton(icon: Icon(Icons.delete, color: Colors.grey)),
           ),
           ListTile(
