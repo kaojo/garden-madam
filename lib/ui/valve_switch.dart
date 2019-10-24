@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:garden_madam/blocs/blocs.dart';
 import 'package:garden_madam/models/models.dart';
 
+import 'theme.dart';
+
 class ValveSwitch extends StatelessWidget {
   final Pin _pin;
 
@@ -15,7 +17,7 @@ class ValveSwitch extends StatelessWidget {
     return Switch(
       value: _pin.status == Status.ON,
       onChanged: (newValue) => togglePin(context, _pin, newValue),
-      activeColor: Colors.blue,
+      activeColor: VALVE_ACTIVE_COLOR,
     );
   }
 

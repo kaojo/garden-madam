@@ -1,19 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:garden_madam/models/models.dart';
 import 'package:garden_madam/ui/valve_detail_image_composition.dart';
 import 'package:garden_madam/ui/valve_switch.dart';
-
-Icon _getScheduleIcon(Pin pin) {
-  if (pin.schedule == null) {
-    return Icon(Icons.add_alarm, color: Colors.grey);
-  }
-
-  if (!pin.schedule.enabled) {
-    return Icon(Icons.access_alarm, color: Colors.grey);
-  }
-
-  return Icon(Icons.access_alarm, color: Colors.lightBlueAccent);
-}
 
 class ValvePage extends StatelessWidget {
   final Pin pin;
@@ -25,13 +15,19 @@ class ValvePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(pin.displayName()),
-        actions: <Widget>[
-          ValveSwitch(pin),
-        ],
       ),
       body: ListView(
         children: <Widget>[
           ValveDetailImageComposition(pin: pin),
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ValveSwitch(pin),
+                _getScheduleIcon(pin),
+              ],
+            ),
+          ),
           ListTile(
             title: TextField(
               enabled: false,
@@ -51,4 +47,16 @@ class ValvePage extends StatelessWidget {
       ),
     );
   }
+}
+
+Icon _getScheduleIcon(Pin pin) {
+  if (pin.schedule == null) {
+    return Icon(Icons.add_alarm, color: Colors.grey);
+  }
+
+  if (!pin.schedule.enabled) {
+    return Icon(Icons.access_alarm, color: Colors.grey);
+  }
+
+  return Icon(Icons.access_alarm, color: Colors.lightBlueAccent);
 }

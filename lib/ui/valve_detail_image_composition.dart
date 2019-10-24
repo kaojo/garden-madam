@@ -4,6 +4,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:garden_madam/models/models.dart';
 import 'package:garden_madam/ui/detail_image_composition.dart';
 
+import 'theme.dart';
+
 class ValveDetailImageComposition extends StatelessWidget {
   const ValveDetailImageComposition({
     Key key,
@@ -16,8 +18,8 @@ class ValveDetailImageComposition extends StatelessWidget {
   Widget build(BuildContext context) {
     return DetailImageComposition(
       status: _pin.status == Status.ON,
-      onColor: Colors.blue,
-      offColor: Colors.grey,
+      onColor: VALVE_ACTIVE_COLOR,
+      offColor: VALVE_INACTIVE_COLOR,
       child: Hero(
         tag: _pin.valvePinNumber,
         child: SvgPicture.asset(

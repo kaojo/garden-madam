@@ -4,6 +4,8 @@ import 'package:garden_madam/mqtt.dart';
 import 'package:garden_madam/ui/butler_page_wrapper.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
+import 'ui/theme.dart';
+
 class SimpleBlocDelegate extends BlocDelegate {
   @override
   onTransition(Bloc bloc, Transition transition) {
@@ -37,7 +39,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Garden Madam',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primarySwatch: APPBAR_COLOR,
       ),
       home: new ButlerPageWrapper(
         butlerId: "local",

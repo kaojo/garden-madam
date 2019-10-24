@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:garden_madam/blocs/blocs.dart';
 import 'package:garden_madam/models/models.dart';
+import 'package:garden_madam/ui/theme.dart';
 import 'package:garden_madam/ui/valve_page_wrapper.dart';
 
 import 'valve_switch.dart';
@@ -27,7 +28,7 @@ class ValvesListItem extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(
               width: 4,
-              color: _pin.status == Status.ON ? Colors.blue : Colors.grey),
+              color: _pin.status == Status.ON ? VALVE_ACTIVE_COLOR : VALVE_INACTIVE_COLOR),
           borderRadius: BorderRadius.circular(45),
         ),
         padding: EdgeInsets.all(5),
