@@ -14,7 +14,8 @@ class ButlerWateringScheduleStatusMqttClient {
   }
 
   Stream<MqttWateringSchedule> getWateringScheduleStatus(String deviceId) {
-    if (mqttClient.getSubscriptionsStatus(_getWateringScheduleStatusTopic(deviceId)) ==
+    if (mqttClient.getSubscriptionsStatus(
+            _getWateringScheduleStatusTopic(deviceId)) ==
         MqttSubscriptionStatus.doesNotExist) {
       _subscribe(deviceId);
     }
@@ -24,7 +25,8 @@ class ButlerWateringScheduleStatusMqttClient {
   }
 
   void _subscribe(String deviceId) {
-    mqttClient.subscribe(_getWateringScheduleStatusTopic(deviceId), MqttQos.exactlyOnce);
+    mqttClient.subscribe(
+        _getWateringScheduleStatusTopic(deviceId), MqttQos.exactlyOnce);
   }
 
   bool _isWateringScheduleStatusMessage(
@@ -38,22 +40,20 @@ class ButlerWateringScheduleStatusMqttClient {
 
   MqttWateringSchedule _mapToHealthStatus(
       List<MqttReceivedMessage<MqttMessage>> event, String deviceId) {
-    var messageWrapper =
-    event.firstWhere((m) => m.topic == _getWateringScheduleStatusTopic(deviceId));
+    var messageWrapper = event.firstWhere(
+        (m) => m.topic == _getWateringScheduleStatusTopic(deviceId));
 
     MqttPublishMessage publishMessage = messageWrapper.payload;
     var payload = MqttPublishPayload.bytesToStringAsString(
         publishMessage.payload.message);
     print(payload);
 
-    var status =
-    MqttWateringSchedule.fromJson(json.decode(payload));
+    var status = MqttWateringSchedule.fromJson(json.decode(payload));
     return status;
   }
 }
 
 class MqttWateringSchedule {
-  bool enabled;
   List<MqttValveSchedule> _schedules;
 
   UnmodifiableListView<MqttValveSchedule> get schedules => _schedules != null
@@ -61,20 +61,27 @@ class MqttWateringSchedule {
       : UnmodifiableListView([]);
 
   MqttWateringSchedule.fromJson(Map<String, dynamic> json) {
-    this.enabled = json['enabled'];
     var schedules = json['schedules'];
     if (schedules != null) {
       this._schedules = List();
       for (var valveSchedule in schedules) {
         var valve = valveSchedule['valve'];
+        var enabled = valveSchedule['enabled'];
         var schedule = valveSchedule['schedule'];
-        if (schedule != null &&
-            schedule['cron_expression'] != null &&
-            schedule['duration_seconds'] != null) {
-          this._schedules.add(MqttValveSchedule(
-              valve,
-              MqttSchedule(
-                  schedule['cron_expression'], schedule['duration_seconds'])));
+        if (schedule != null) {
+          this._schedules.add(
+                MqttValveSchedule(
+                    valve,
+                    MqttSchedule(
+                      schedule['start_hour'],
+                      schedule['start_minute'],
+                      schedule['end_hour'],
+                      schedule['end_minute'],
+                    ),
+                    enabled),
+              );
+        } else {
+          print("Could not parse schedule: $schedule");
         }
       }
     }
@@ -84,15 +91,28 @@ class MqttWateringSchedule {
 class MqttValveSchedule {
   final int valve;
   final MqttSchedule schedule;
+  final bool enabled;
 
-  MqttValveSchedule(this.valve, this.schedule);
+  MqttValveSchedule(this.valve, this.schedule, this.enabled);
 }
 
 class MqttSchedule {
   // ignore: non_constant_identifier_names
-  final String cron_expression;
-  // ignore: non_constant_identifier_names
-  final int duration_seconds;
+  final int start_hour;
 
-  MqttSchedule(this.cron_expression, this.duration_seconds);
+  // ignore: non_constant_identifier_names
+  final int start_minute;
+
+  // ignore: non_constant_identifier_names
+  final int end_hour;
+
+  // ignore: non_constant_identifier_names
+  final int end_minute;
+
+  MqttSchedule(
+    this.start_hour,
+    this.start_minute,
+    this.end_hour,
+    this.end_minute,
+  );
 }

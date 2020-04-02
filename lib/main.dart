@@ -23,13 +23,14 @@ class MyApp extends StatelessWidget {
 // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-// TODO load mqtt config from local storage or something
+    // TODO load mqtt config from local storage or something
     final mqttConfig = MqttConfig(
         "mqtt.flespi.io",
         8883,
         "FlespiToken 2PytGtM3gJZWa4JmJy1cDYuTkeZAmubd7xwCP8vVFiFEcdQKBFM2r4JB8wZjOZmM",
         "",
         "garden_madam_dev");
+
     var mqttClient = MqttClient.withPort(
         mqttConfig.hostname, mqttConfig.client_id, mqttConfig.port);
     mqttClient.secure = true;

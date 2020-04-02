@@ -115,7 +115,7 @@ class ButlerRepository {
   bool _mqttClientIsConnected(MqttClientConnectionStatus status) =>
       status != null && status.state == MqttConnectionState.connected;
 
-  void _updateFromHealthStatus(status) {
+  void _updateFromHealthStatus(MqttHealthStatus status) {
     if (status == MqttHealthStatus.online) {
       this._butler.online = true;
     } else {
@@ -124,7 +124,7 @@ class ButlerRepository {
     _butlerWasUpdated();
   }
 
-  void _updateFromScheduleStatus(status) {
+  void _updateFromScheduleStatus(MqttWateringSchedule status) {
     for (var schedule in status.schedules) {
       var pin = this._butler.findPin(schedule.valve);
       if (pin == null) {
@@ -132,17 +132,16 @@ class ButlerRepository {
         this._butler.addPin(pin);
       }
 
-      var cronExpression = schedule.schedule.cron_expression;
-      var durationSeconds = schedule.schedule.duration_seconds;
-      if (cronExpression != null && durationSeconds != null) {
-        pin.schedule =
-            Schedule(cronExpression, durationSeconds, enabled: status.enabled);
+      TimeOfDay startTime = _getStartTime(schedule.schedule);
+      TimeOfDay endTime = _getEndTime(schedule.schedule);
+      if (startTime != null && endTime != null) {
+        pin.addSchedule(Schedule(startTime, endTime, enabled: schedule.enabled));
       }
     }
     _butlerWasUpdated();
   }
 
-  void _updateFromLayoutStatus(status) {
+  void _updateFromLayoutStatus(MqttLayoutStatus status) {
     for (var valve in status.valves) {
       var pin = this._butler.findPin(valve.valve_pin_number);
       if (pin == null) {
@@ -183,4 +182,20 @@ class ButlerRepository {
   Stream<Butler> butlerUpdatedStream() {
     return _butlerUpdated.stream;
   }
+
+  TimeOfDay _getStartTime(MqttSchedule schedule) {
+    return _getTime(schedule.start_hour, schedule.start_minute);
+  }
+
+  TimeOfDay _getEndTime(MqttSchedule schedule) {
+    return _getTime(schedule.end_hour, schedule.end_minute);
+  }
+
+  TimeOfDay _getTime(int hour, int minute) {
+    if (hour != null && minute != null) {
+      return TimeOfDay(hour: hour, minute: minute);
+    }
+    return null;
+  }
+
 }

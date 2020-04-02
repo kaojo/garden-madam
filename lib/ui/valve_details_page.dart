@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden_madam/models/models.dart';
+import 'package:garden_madam/ui/schedule_list_tile.dart';
 import 'package:garden_madam/ui/valve_detail_image_composition.dart';
 import 'package:garden_madam/ui/valve_switch.dart';
 
@@ -22,7 +23,10 @@ class ValvePage extends StatelessWidget {
           ValveDetailImageComposition(pin: pin),
           ListTile(
             leading: ValveSwitch(pin),
-            title: Text("On/Off", style: TextStyle(fontWeight: FontWeight.bold),),
+            title: Text(
+              "On/Off",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             trailing: Text("00:00:00"),
           ),
           Divider(
@@ -36,30 +40,11 @@ class ValvePage extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          ListTile(
-            leading: Switch(
-              value: false,
-              onChanged: (bool newValue) {
-                // Add your onChanged code here!
-              },
-            ),
-            title: Text("17:00 - 18:00"),
-            trailing: IconButton(icon: Icon(Icons.delete, color: Colors.grey)),
-          ),
-          ListTile(
-            leading: Switch(
-              value: true,
-              onChanged: (bool newValue) {
-                // Add your onChanged code here!
-              },
-            ),
-            title: Text("09:00 - 09:30"),
-            trailing: IconButton(icon: Icon(Icons.delete, color: Colors.grey)),
-          ),
+          ...getScheduleListTiles(),
           ListTile(
             title: RaisedButton(
               onPressed: () {
-                // Do stuff
+                // Open "add schedule dialog"
               },
               child: Container(
                 child: Row(
@@ -82,4 +67,8 @@ class ValvePage extends StatelessWidget {
       ),
     );
   }
+
+  List<ScheduleListTile> getScheduleListTiles() => pin.schedules
+        .map((schedule) => ScheduleListTile(schedule: schedule))
+        .toList();
 }

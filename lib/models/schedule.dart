@@ -1,9 +1,11 @@
 
+import 'package:flutter/material.dart';
+
 class Schedule {
   bool enabled = true;
-  String cronExpression;
-  int durationSeconds;
+  TimeOfDay startTime;
+  TimeOfDay endTime;
 
-  Schedule(this.cronExpression, this.durationSeconds, {this.enabled = true});
+  Schedule(this.startTime, this.endTime, {this.enabled = true});
 
 }

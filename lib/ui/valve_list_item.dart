@@ -6,8 +6,6 @@ import 'package:garden_madam/models/models.dart';
 import 'package:garden_madam/ui/theme.dart';
 import 'package:garden_madam/ui/valve_page_wrapper.dart';
 
-import 'valve_switch.dart';
-
 class ValvesListItem extends StatelessWidget {
   final Pin _pin;
 

@@ -12,6 +12,7 @@ class Butler {
   UnmodifiableListView<Pin> get pins => _pins != null ? UnmodifiableListView(_pins) : UnmodifiableListView([]);
 
   Butler(this.id, this.name);
+
   Pin findPin(int pinNumber) {
     for (var pin in this.pins) {
       if (pin.valvePinNumber == pinNumber) {
