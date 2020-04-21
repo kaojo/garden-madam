@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:garden_madam/mqtt.dart';
-import 'package:garden_madam/ui/butler_page_wrapper.dart';
+import 'package:garden_madam/ui/overview_page_wrapper.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
 import 'ui/theme.dart';
@@ -44,11 +44,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: APPBAR_COLOR,
       ),
-      home: new ButlerPageWrapper(
-        butlerId: "local",
-        butlerName: "Virtueller Dev Buttler",
-        mqttConfig: mqttConfig,
+      home: OverviewPageWrapper(
         mqttClient: mqttClient,
+        mqttConfig: mqttConfig,
       ),
     );
   }

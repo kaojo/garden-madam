@@ -30,7 +30,7 @@ class ButlerWateringScheduleStatusMqttClient {
     this.mqttClient.publishMessage(
         _scheduleDisableCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
 
-    return Void();
+    return null;
   }
 
   Future<Void> enableSchedule(String deviceId,
@@ -40,7 +40,7 @@ class ButlerWateringScheduleStatusMqttClient {
     this.mqttClient.publishMessage(
         _scheduleEnableCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
 
-    return Void();
+    return null;
   }
 
   Future<Void> deleteSchedule(String deviceId,
@@ -50,7 +50,7 @@ class ButlerWateringScheduleStatusMqttClient {
     this.mqttClient.publishMessage(
         _scheduleDeleteCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
 
-    return Void();
+    return null;
   }
 
   Future<Void> createSchedule(String deviceId,
@@ -60,7 +60,7 @@ class ButlerWateringScheduleStatusMqttClient {
     this.mqttClient.publishMessage(
         _scheduleCreateCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
 
-    return Void();
+    return null;
   }
 
   String _getWateringScheduleStatusTopic(String deviceId) {

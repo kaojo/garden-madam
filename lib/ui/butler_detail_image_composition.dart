@@ -15,10 +15,13 @@ class ButlerDetailImageComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DetailImageComposition(
-      status: _butler.online,
-      child: SvgPicture.asset('images/butler.svg',
-          semanticsLabel: 'Butler default image'),
+    return Hero(
+      tag: _butler.id,
+      child: DetailImageComposition(
+        status: _butler.online,
+        child: SvgPicture.asset('images/butler.svg',
+            semanticsLabel: 'Butler default image'),
+      ),
     );
   }
 }

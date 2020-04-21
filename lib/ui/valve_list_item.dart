@@ -52,12 +52,16 @@ class ValvesListItem extends StatelessWidget {
 
   navigateToValvePage(BuildContext context) {
     var butlerBloc = BlocProvider.of<ButlerBloc>(context);
-    Navigator.push(context,
-        MaterialPageRoute(builder: (BuildContext newContext) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext newContext) {
           return ValvePageWrapper(
             pin: _pin,
             butlerBloc: butlerBloc,
           );
-        }));
+        },
+      ),
+    );
   }
 }

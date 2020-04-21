@@ -65,7 +65,7 @@ class ButlerLayoutStatusMqttClient {
     Uint8Buffer buffer = _convertPinNumberToPayload(valvePinNumber);
     this.mqttClient.publishMessage(
         _layoutCloseCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
-    return Void();
+    return null;
   }
 
   Future<Void> turnOn(String deviceId, int valvePinNumber) async {
@@ -73,7 +73,7 @@ class ButlerLayoutStatusMqttClient {
     this.mqttClient.publishMessage(
         _layoutOpenCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
 
-    return Void();
+    return null;
   }
 
   Uint8Buffer _convertPinNumberToPayload(int valvePinNumber) {
