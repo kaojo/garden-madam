@@ -5,29 +5,30 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:garden_madam/blocs/blocs.dart';
 import 'package:garden_madam/models/models.dart';
 
-import 'theme.dart';
+class ScheduleSwitch extends StatelessWidget {
+  final Schedule _schedule;
 
-class ValveSwitch extends StatelessWidget {
-  final Pin _pin;
-
-  ValveSwitch(this._pin);
+  ScheduleSwitch(this._schedule);
 
   @override
   Widget build(BuildContext context) {
     return Switch(
-      value: _pin.status == Status.ON,
-      onChanged: (newValue) => togglePin(context, _pin, newValue),
-      activeColor: VALVE_ACTIVE_COLOR,
+      value: _schedule.enabled,
+      onChanged: (newValue) => togglePin(context, _schedule, newValue),
     );
   }
 
-  togglePin(BuildContext context, Pin pin, bool newValue) {
+  togglePin(BuildContext context, Schedule schedule, bool newValue) {
     try {
-      ToggleValveEvent toggleValveEvent = _createToggleEvent(pin);
+      ToggleScheduleEvent toggleValveEvent = _createToggleEvent(schedule);
       _dispatchEvent(context, toggleValveEvent);
     } on Exception catch (e) {
-      _handleToggleError(context, _pin, newValue, e);
+      _handleToggleError(context, _schedule, newValue, e);
     }
+  }
+
+  ToggleScheduleEvent _createToggleEvent(Schedule schedule) {
+    return ToggleScheduleEvent(schedule);
   }
 
   void _dispatchEvent(BuildContext context, ButlerEvent event) {
@@ -35,25 +36,10 @@ class ValveSwitch extends StatelessWidget {
     butlerBloc.dispatch(event);
   }
 
-  ToggleValveEvent _createToggleEvent(Pin pin) {
-    var direction = _determineToggleDirection();
-    return ToggleValveEvent(pin: pin, toggleDirection: direction);
-  }
-
-  _determineToggleDirection() {
-    var direction;
-    if (_pin.isTurnedOn()) {
-      direction = ToggleDirection.off;
-    } else {
-      direction = ToggleDirection.on;
-    }
-    return direction;
-  }
-
   void _handleToggleError(
-      BuildContext context, Pin pin, bool newValue, Exception e) {
+      BuildContext context, Schedule schedule, bool newValue, Exception e) {
     log(e.toString());
-    _restoreOldPinStatus(pin, newValue);
+    _restoreOldScheduleStatus(schedule, newValue);
     _displayErrorDialog(context);
   }
 
@@ -79,7 +65,7 @@ class ValveSwitch extends StatelessWidget {
     );
   }
 
-  void _restoreOldPinStatus(Pin pin, bool newValue) {
-    pin.status = newValue ? Status.OFF : Status.ON;
+  void _restoreOldScheduleStatus(Schedule schedule, bool newValue) {
+    schedule.enabled = !newValue;
   }
 }

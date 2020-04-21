@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:garden_madam/models/models.dart';
@@ -22,37 +24,43 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
 
   @override
   Stream<ButlerState> mapEventToState(ButlerEvent event) async* {
-    if (event is LoadButler) {
-      yield ButlerLoading();
-      try {
+    try {
+      if (event is LoadButler) {
+        yield ButlerLoading();
         final Butler butler = await butlerRepository.getButler();
         if (butler == null) {
           yield ButlerEmpty();
         } else {
           yield ButlerLoaded(butler: butler);
         }
-      } catch (_) {
-        yield ButlerError();
-      }
-    } else if (event is ToggleValveEvent) {
-      Butler butler;
-      if (event.toggleDirection == ToggleDirection.on) {
-        butler = await butlerRepository.turnOnWithRetry(event.pin);
-      } else {
-        butler = await butlerRepository.turnOffWithRetry(event.pin);
-      }
-      yield ButlerLoaded(butler: butler);
-    } else if (event is RefreshButler) {
-      try {
+      } else if (event is RefreshButler) {
         final Butler butler = await butlerRepository.getButler();
         if (butler == null) {
           yield ButlerEmpty();
         } else {
           yield ButlerLoaded(butler: butler);
         }
-      } catch (_) {
-        yield ButlerError();
+      } else if (event is ToggleValveEvent) {
+        Butler butler;
+        if (event.toggleDirection == ToggleDirection.on) {
+          butler = await butlerRepository.turnOnWithRetry(event.pin);
+        } else {
+          butler = await butlerRepository.turnOffWithRetry(event.pin);
+        }
+        yield ButlerLoaded(butler: butler);
+      } else if (event is ToggleScheduleEvent) {
+        Butler butler = await butlerRepository.toggleSchedule(event.schedule);
+        yield ButlerLoaded(butler: butler);
+      } else if (event is DeleteScheduleEvent) {
+        Butler butler = await butlerRepository.deleteSchedule(event.schedule);
+        yield ButlerLoaded(butler: butler);
+      } else if (event is CreateScheduleEvent) {
+        Butler butler = await butlerRepository.createSchedule(event.schedule);
+        yield ButlerLoaded(butler: butler);
       }
+    } catch (e) {
+      log(e.toString());
+      yield ButlerError();
     }
   }
 

@@ -2,14 +2,14 @@ import 'dart:collection';
 
 import 'package:garden_madam/models/pin.dart';
 
-
 class Butler {
   final String name;
   final String id;
   List<Pin> _pins;
   bool online = false;
 
-  UnmodifiableListView<Pin> get pins => _pins != null ? UnmodifiableListView(_pins) : UnmodifiableListView([]);
+  UnmodifiableListView<Pin> get pins =>
+      _pins != null ? UnmodifiableListView(_pins) : UnmodifiableListView([]);
 
   Butler(this.id, this.name);
 
@@ -31,4 +31,8 @@ class Butler {
     }
   }
 
+  @override
+  String toString() {
+    return 'Butler{name: $name, id: $id, _pins: $_pins, online: $online}';
+  }
 }

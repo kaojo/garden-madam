@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:garden_madam/datahandlers/datahandlers.dart';
@@ -40,10 +41,10 @@ class ButlerRepository {
 
   Future<Butler> turnOffWithRetry(Pin pin) async {
     await doTurnOff(pin).catchError((error) {
-      print(error);
-      refresh().then((_) {
+      log(error);
+      _refresh().then((_) {
         return doTurnOff(pin)
-            .catchError((error) => print("TODO: handle retry error"));
+            .catchError((error) => log("TODO: handle retry error"));
       });
     });
     return _butler;
@@ -51,10 +52,10 @@ class ButlerRepository {
 
   Future<Butler> turnOnWithRetry(Pin pin) async {
     await doTurnOn(pin).catchError((error) {
-      print(error);
-      refresh().then((_) {
+      log(error);
+      _refresh().then((_) {
         return doTurnOn(pin)
-            .catchError((error) => print("TODO: handle retry error"));
+            .catchError((error) => log("TODO: handle retry error"));
       });
     });
     return _butler;
@@ -76,12 +77,50 @@ class ButlerRepository {
     return _butler;
   }
 
-  Future<void> refresh() async {
-    print('refresh');
+  Future<Butler> toggleSchedule(Schedule schedule) async {
+    MqttValveSchedule mqttSchedule = mapToMqttValveSchedule(schedule);
+    if (schedule.enabled) {
+      await this
+          ._butlerWateringScheduleStatusMqttClient
+          .disableSchedule(this._butler.id, mqttSchedule)
+          .then((_) => schedule.disable());
+    } else {
+      await this
+          ._butlerWateringScheduleStatusMqttClient
+          .enableSchedule(this._butler.id, mqttSchedule)
+          .then((_) => schedule.enable());
+    }
+    return _butler;
+  }
+
+  Future<Butler> deleteSchedule(Schedule schedule) async {
+    MqttValveSchedule mqttSchedule = mapToMqttValveSchedule(schedule);
+    await this
+        ._butlerWateringScheduleStatusMqttClient
+        .deleteSchedule(this._butler.id, mqttSchedule)
+        .then((_) =>
+        this._butler.findPin(schedule.valvePin).removeSchedule(schedule));
+
+    return _butler;
+  }
+
+  Future<Butler> createSchedule(Schedule schedule) async {
+    MqttValveSchedule mqttSchedule = mapToMqttValveSchedule(schedule);
+    await this
+        ._butlerWateringScheduleStatusMqttClient
+        .createSchedule(this._butler.id, mqttSchedule)
+        .then((_) =>
+        this._butler.findPin(schedule.valvePin).addSchedule(schedule));
+
+    return _butler;
+  }
+
+  Future<void> _refresh() async {
+    log('refresh');
     if (this.mqttClient.connectionStatus == null ||
         this.mqttClient.connectionStatus.state !=
             MqttConnectionState.connected) {
-      print('try reconnect');
+      log('try reconnect');
       return _connect();
     }
   }
@@ -104,11 +143,11 @@ class ButlerRepository {
           .getHealthStatus(this._butler.id)
           .forEach(_updateFromHealthStatus);
     } else {
-      print(
+      log(
           'Error detected. Subscription to mqtt topics attempted on a invalid connection.');
-      print('$status');
-      if (status != null) print('${status.state}');
-      print(this.mqttClient.connectionStatus.returnCode);
+      log('$status');
+      if (status != null) log('${status.state}');
+      log(this.mqttClient.connectionStatus.returnCode.toString());
     }
   }
 
@@ -135,7 +174,8 @@ class ButlerRepository {
       TimeOfDay startTime = _getStartTime(schedule.schedule);
       TimeOfDay endTime = _getEndTime(schedule.schedule);
       if (startTime != null && endTime != null) {
-        pin.addSchedule(Schedule(startTime, endTime, enabled: schedule.enabled));
+        pin.addSchedule(Schedule(pin.valvePinNumber, startTime, endTime,
+            enabled: schedule.enabled));
       }
     }
     _butlerWasUpdated();
@@ -157,7 +197,7 @@ class ButlerRepository {
           status = Status.OFF;
           break;
         case MqttValveStatus.UNKNOWN:
-          print('unknown valve status found');
+          log('unknown valve status found');
           status = Status.OFF;
           break;
       }
@@ -171,7 +211,7 @@ class ButlerRepository {
   }
 
   Future<void> _connect() {
-    print('Starting connection to mqtt server.');
+    log('Starting connection to mqtt server.');
     return this
         .mqttClient
         .connect(mqttConfig.username, mqttConfig.password)
@@ -198,4 +238,11 @@ class ButlerRepository {
     return null;
   }
 
+  MqttValveSchedule mapToMqttValveSchedule(Schedule schedule) {
+    return MqttValveSchedule(
+        schedule.valvePin,
+        MqttSchedule(schedule.startTime.hour, schedule.startTime.minute,
+            schedule.endTime.hour, schedule.endTime.minute),
+        schedule.enabled);
+  }
 }

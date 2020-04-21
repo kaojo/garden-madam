@@ -1,17 +1,16 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:developer';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
+import 'package:typed_data/typed_data.dart';
 
 class ButlerWateringScheduleStatusMqttClient {
   final MqttClient mqttClient;
 
   ButlerWateringScheduleStatusMqttClient({@required this.mqttClient});
-
-  String _getWateringScheduleStatusTopic(String deviceId) {
-    return '$deviceId/garden-butler/status/watering-schedule';
-  }
 
   Stream<MqttWateringSchedule> getWateringScheduleStatus(String deviceId) {
     if (mqttClient.getSubscriptionsStatus(
@@ -22,6 +21,66 @@ class ButlerWateringScheduleStatusMqttClient {
     return mqttClient.updates
         .where((event) => _isWateringScheduleStatusMessage(event, deviceId))
         .map((event) => _mapToHealthStatus(event, deviceId));
+  }
+
+  Future<Void> disableSchedule(String deviceId,
+      MqttValveSchedule mqttValveSchedule) async {
+    Uint8Buffer buffer =
+    _convertMqttValveScheduleToJsonPayload(mqttValveSchedule);
+    this.mqttClient.publishMessage(
+        _scheduleDisableCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
+
+    return Void();
+  }
+
+  Future<Void> enableSchedule(String deviceId,
+      MqttValveSchedule mqttValveSchedule) async {
+    Uint8Buffer buffer =
+    _convertMqttValveScheduleToJsonPayload(mqttValveSchedule);
+    this.mqttClient.publishMessage(
+        _scheduleEnableCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
+
+    return Void();
+  }
+
+  Future<Void> deleteSchedule(String deviceId,
+      MqttValveSchedule mqttValveSchedule) async {
+    Uint8Buffer buffer =
+    _convertMqttValveScheduleToJsonPayload(mqttValveSchedule);
+    this.mqttClient.publishMessage(
+        _scheduleDeleteCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
+
+    return Void();
+  }
+
+  Future<Void> createSchedule(String deviceId,
+      MqttValveSchedule mqttValveSchedule) async {
+    Uint8Buffer buffer =
+    _convertMqttValveScheduleToJsonPayload(mqttValveSchedule);
+    this.mqttClient.publishMessage(
+        _scheduleCreateCommandTopic(deviceId), MqttQos.exactlyOnce, buffer);
+
+    return Void();
+  }
+
+  String _getWateringScheduleStatusTopic(String deviceId) {
+    return '$deviceId/garden-butler/status/watering-schedule';
+  }
+
+  String _scheduleDisableCommandTopic(String deviceId) {
+    return '$deviceId/garden-butler/status/watering-schedule/disable';
+  }
+
+  String _scheduleEnableCommandTopic(String deviceId) {
+    return '$deviceId/garden-butler/status/watering-schedule/enable';
+  }
+
+  String _scheduleDeleteCommandTopic(String deviceId) {
+    return '$deviceId/garden-butler/status/watering-schedule/delete';
+  }
+
+  String _scheduleCreateCommandTopic(String deviceId) {
+    return '$deviceId/garden-butler/status/watering-schedule/create';
   }
 
   void _subscribe(String deviceId) {
@@ -46,10 +105,18 @@ class ButlerWateringScheduleStatusMqttClient {
     MqttPublishMessage publishMessage = messageWrapper.payload;
     var payload = MqttPublishPayload.bytesToStringAsString(
         publishMessage.payload.message);
-    print(payload);
+    log(payload);
 
     var status = MqttWateringSchedule.fromJson(json.decode(payload));
     return status;
+  }
+
+  Uint8Buffer _convertMqttValveScheduleToJsonPayload(
+      MqttValveSchedule mqttValveSchedule) {
+    var data = utf8.encode(jsonEncode(mqttValveSchedule.toJson()));
+    var buffer = new Uint8Buffer();
+    buffer.addAll(data);
+    return buffer;
   }
 }
 
@@ -81,7 +148,7 @@ class MqttWateringSchedule {
                     enabled),
               );
         } else {
-          print("Could not parse schedule: $schedule");
+          log("Could not parse schedule: $schedule");
         }
       }
     }
@@ -94,6 +161,13 @@ class MqttValveSchedule {
   final bool enabled;
 
   MqttValveSchedule(this.valve, this.schedule, this.enabled);
+
+  Map<String, dynamic> toJson() =>
+      {
+        'valve': valve,
+        'enabled': enabled,
+        'schedule': schedule.toJson(),
+      };
 }
 
 class MqttSchedule {
@@ -115,4 +189,12 @@ class MqttSchedule {
     this.end_hour,
     this.end_minute,
   );
+
+  Map<String, dynamic> toJson() =>
+      {
+        'start_hour': start_hour,
+        'start_minute': start_minute,
+        'end_hour': end_hour,
+        'end_minute': end_minute,
+      };
 }

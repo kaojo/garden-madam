@@ -1,10 +1,11 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:ffi';
 
-import 'package:typed_data/typed_data.dart';
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
+import 'package:typed_data/typed_data.dart';
 
 class ButlerLayoutStatusMqttClient {
   final MqttClient mqttClient;
@@ -54,7 +55,7 @@ class ButlerLayoutStatusMqttClient {
     MqttPublishMessage publishMessage = messageWrapper.payload;
     var payload = MqttPublishPayload.bytesToStringAsString(
         publishMessage.payload.message);
-    print(payload);
+    log(payload);
 
     var status = MqttLayoutStatus.fromJson(json.decode(payload));
     return status;
@@ -113,8 +114,6 @@ class MqttLayoutStatus {
   String toString() {
     return 'MqttLayoutStatus{_valves: $_valves}';
   }
-
-
 }
 
 class MqttValve {
@@ -128,7 +127,6 @@ class MqttValve {
   String toString() {
     return 'MqttValve{valve_pin_number: $valve_pin_number, status: $status}';
   }
-
 }
 
 enum MqttValveStatus {
@@ -144,6 +142,6 @@ MqttValveStatus _valveStatusfromString(String s) {
   if (s == 'CLOSED') {
     return MqttValveStatus.CLOSED;
   }
-  print('could not find MqttValveStatus for string $s');
+  log('could not find MqttValveStatus for string $s');
   return MqttValveStatus.UNKNOWN;
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
@@ -24,8 +26,7 @@ class ButlerHealthStatusMqttClient {
     mqttClient.subscribe(_getHealthStatusTopic(deviceId), MqttQos.exactlyOnce);
   }
 
-  bool _isHealthStatusMessage(
-      List<MqttReceivedMessage<MqttMessage>> event, String deviceId) {
+  bool _isHealthStatusMessage(List<MqttReceivedMessage<MqttMessage>> event, String deviceId) {
     return event != null &&
         event.isNotEmpty &&
         event
@@ -33,15 +34,14 @@ class ButlerHealthStatusMqttClient {
             .isNotEmpty;
   }
 
-  MqttHealthStatus _mapToHealthStatus(
-      List<MqttReceivedMessage<MqttMessage>> event, String deviceId) {
+  MqttHealthStatus _mapToHealthStatus(List<MqttReceivedMessage<MqttMessage>> event, String deviceId) {
     var messageWrapper =
-        event.firstWhere((m) => m.topic == _getHealthStatusTopic(deviceId));
+    event.firstWhere((m) => m.topic == _getHealthStatusTopic(deviceId));
 
     MqttPublishMessage publishMessage = messageWrapper.payload;
     var payload = MqttPublishPayload.bytesToStringAsString(
         publishMessage.payload.message);
-    print(payload);
+    log(payload);
 
     var healthStatus;
     if (payload == "ONLINE") {

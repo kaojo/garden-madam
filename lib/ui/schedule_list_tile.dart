@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:garden_madam/models/models.dart';
+import 'package:garden_madam/ui/schedule_delete_button.dart';
+import 'package:garden_madam/ui/schedule_switch.dart';
 
 class ScheduleListTile extends StatelessWidget {
   final Schedule schedule;
@@ -9,23 +11,16 @@ class ScheduleListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Switch(
-        value: schedule.enabled,
-        onChanged: (bool newValue) {
-          // Toggle Schedule enabled flag
-        },
-      ),
-      title: Text(formatScheduleTimes(context)),
-      trailing: IconButton(
-        icon: Icon(Icons.delete, color: Colors.grey),
-        onPressed: () {
-          // delete schedule
-        },
-      ),
+      leading: ScheduleSwitch(schedule),
+      title: _scheduleTimes(context),
+      trailing: ScheduleDeleteButton(schedule),
     );
   }
 
-  String formatScheduleTimes(BuildContext context) {
+  Text _scheduleTimes(BuildContext context) =>
+      Text(_formatScheduleTimes(context));
+
+  String _formatScheduleTimes(BuildContext context) {
     var start = schedule.startTime != null
         ? schedule.startTime.format(context)
         : "Start";
@@ -34,7 +29,4 @@ class ScheduleListTile extends StatelessWidget {
     return "$start -> $end";
   }
 
-  String formatTime(BuildContext context, TimeOfDay time) {
-    return time != null ? time.format(context) : "NA";
-  }
 }

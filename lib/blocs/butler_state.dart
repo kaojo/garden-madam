@@ -15,4 +15,9 @@ class ButlerLoaded extends ButlerState {
   final Butler butler;
 
   const ButlerLoaded({@required this.butler}) : assert(butler != null);
+
+  @override
+  String toString() {
+    return 'ButlerLoaded{butler: $butler}';
+  }
 }

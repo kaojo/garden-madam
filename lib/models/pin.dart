@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:garden_madam/models/schedule.dart';
@@ -18,6 +19,7 @@ class Pin {
   Pin(this.valvePinNumber);
 
   void addSchedule(Schedule schedule) {
+    log("Pin: add schedule");
     if (findSchedule(schedule.startTime, schedule.endTime) == null) {
       _schedules.add(schedule);
     }
@@ -30,6 +32,17 @@ class Pin {
       }
     }
     return null;
+  }
+
+  removeSchedule(Schedule schedule) {
+    for (var i = 0; i < _schedules.length; ++i) {
+      var tempSchedule = _schedules[i];
+      if (schedule.startTime == tempSchedule.startTime &&
+          schedule.endTime == tempSchedule.endTime) {
+        _schedules.removeAt(i);
+        return;
+      }
+    }
   }
 
   String displayName() {
@@ -50,6 +63,11 @@ class Pin {
 
   bool isTurnedOn() {
     return status == Status.ON;
+  }
+
+  @override
+  String toString() {
+    return 'Pin{name: $name, valvePinNumber: $valvePinNumber, status: $status, _schedules: $_schedules, imageName: $imageName}';
   }
 }
 
