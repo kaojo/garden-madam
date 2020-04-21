@@ -16,7 +16,8 @@ class ToggleValveEvent extends ButlerEvent {
 
   @override
   String toString() {
-    return 'ToggleValveEvent{pin: $pin, toggleDirection: $toggleDirection}';
+    return 'ToggleValveEvent{pin: ${pin
+        .valvePinNumber}, toggleDirection: $toggleDirection}';
   }
 }
 

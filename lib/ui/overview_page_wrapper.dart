@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:garden_madam/blocs/butler_bloc.dart';
 import 'package:garden_madam/models/butler.dart';
 import 'package:garden_madam/mqtt.dart';
+import 'package:garden_madam/repositories/butler_repository.dart';
+import 'package:garden_madam/ui/butler_card.dart';
 import 'package:mqtt_client/mqtt_client.dart';
-
-import 'butler_detail_image_composition.dart';
-import 'butler_page_wrapper.dart';
 
 class OverviewPageWrapper extends StatelessWidget {
   final MqttConfig mqttConfig;
@@ -19,49 +20,36 @@ class OverviewPageWrapper extends StatelessWidget {
       appBar: AppBar(
         title: Text("My Buttlers"),
       ),
-      body: butlerCard(context),
+      body: _butlerCard(context),
     );
   }
 
-  Widget butlerCard(BuildContext context) {
+  Widget _butlerCard(BuildContext context) {
     var butlerId = "local";
     var butlerName = "Virtueller Dev Buttler";
-    return Container(
-      padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-      height: 350,
-      child: Card(
-        elevation: 1,
-        child: InkWell(
-          onTap: () => _navigateToButlerPage(context, butlerId, butlerName),
-          child: Column(
-            children: <Widget>[
-              ButlerDetailImageComposition(
-                  butler: Butler(butlerId, butlerName)),
-              Text(
-                butlerName,
-                textScaleFactor: 2,
-              )
-            ],
-          ),
-        ),
+    return RepositoryProvider(
+      builder: (context) {
+        ButlerRepository butlerRepository = _buildButlerRepository(context);
+        butlerRepository.connect(Butler(butlerId, butlerName));
+        return butlerRepository;
+      },
+      child: BlocProvider(
+        builder: (context) {
+          var bloc = ButlerBloc(
+            butlerRepository: RepositoryProvider.of<ButlerRepository>(context),
+          );
+          bloc.init();
+          return bloc;
+        },
+        child: ButlerCard(),
       ),
     );
   }
 
-  void _navigateToButlerPage(
-      BuildContext context, String butlerId, String butlerName) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext newContext) {
-          return new ButlerPageWrapper(
-            butlerId: butlerId,
-            butlerName: butlerName,
-            mqttConfig: mqttConfig,
-            mqttClient: mqttClient,
-          );
-        },
-      ),
+  ButlerRepository _buildButlerRepository(BuildContext context) {
+    return ButlerRepository(
+      mqttClient: mqttClient,
+      mqttConfig: mqttConfig,
     );
   }
 }

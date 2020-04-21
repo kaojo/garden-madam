@@ -16,6 +16,7 @@ class ButlerPage extends StatelessWidget {
         title: Text(butlerName),
       ),
       body: RefreshIndicator(
+        onRefresh: () async => _loadButler(context),
         child: BlocBuilder<ButlerBloc, ButlerState>(
           builder: (BuildContext context, ButlerState state) {
             if (state is ButlerError) {
@@ -37,7 +38,6 @@ class ButlerPage extends StatelessWidget {
             }
           },
         ),
-        onRefresh: () async => _loadButler(context),
       ),
     );
   }

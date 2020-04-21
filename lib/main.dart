@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
     mqttClient.secure = true;
     mqttClient.onConnected = _onConnected;
     mqttClient.onSubscribed = _onSubscribed;
+    //mqttClient.logging(on: true);
 
     return MaterialApp(
       title: 'Garden Madam',
