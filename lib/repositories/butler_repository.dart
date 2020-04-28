@@ -215,7 +215,6 @@ class ButlerRepository {
     return this
         .mqttClient
         .connect(mqttConfig.username, mqttConfig.password)
-        .timeout(Duration(seconds: 5))
         .then(_subscribeToButlerStatusStreams);
   }
 

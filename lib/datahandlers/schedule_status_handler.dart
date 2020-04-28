@@ -68,19 +68,19 @@ class ButlerWateringScheduleStatusMqttClient {
   }
 
   String _scheduleDisableCommandTopic(String deviceId) {
-    return '$deviceId/garden-butler/status/watering-schedule/disable';
+    return '$deviceId/garden-butler/command/watering-schedule/disable';
   }
 
   String _scheduleEnableCommandTopic(String deviceId) {
-    return '$deviceId/garden-butler/status/watering-schedule/enable';
+    return '$deviceId/garden-butler/command/watering-schedule/enable';
   }
 
   String _scheduleDeleteCommandTopic(String deviceId) {
-    return '$deviceId/garden-butler/status/watering-schedule/delete';
+    return '$deviceId/garden-butler/command/watering-schedule/delete';
   }
 
   String _scheduleCreateCommandTopic(String deviceId) {
-    return '$deviceId/garden-butler/status/watering-schedule/create';
+    return '$deviceId/garden-butler/command/watering-schedule/create';
   }
 
   void _subscribe(String deviceId) {
