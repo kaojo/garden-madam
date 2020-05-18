@@ -38,12 +38,11 @@ class AddScheduleButton extends StatelessWidget {
   }
 
   _navigateToSchedulePage(BuildContext context) {
-    var butlerBloc = BlocProvider.of<ButlerBloc>(context);
     Navigator.push(context,
         MaterialPageRoute(builder: (BuildContext newContext) {
       return SchedulePageWrapper(
         pin: pin,
-        butlerBloc: butlerBloc,
+        butlerBloc: BlocProvider.of<ButlerBloc>(context),
       );
     }));
   }

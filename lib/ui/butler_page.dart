@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:garden_madam/blocs/blocs.dart';
 
+import '../main.dart';
 import 'butler_details.dart';
 
 class ButlerPage extends StatelessWidget {
@@ -28,7 +29,7 @@ class ButlerPage extends StatelessWidget {
             } else if (state is ButlerLoaded) {
               return ButlerDetailsPage(state.butler);
             } else if (state is ButlerLoading) {
-              return _loadingAnimation();
+              return loadingAnimation();
             } else {
               return ListView(
                 children: <Widget>[
@@ -43,11 +44,5 @@ class ButlerPage extends StatelessWidget {
   }
 
   void _loadButler(BuildContext context) =>
-      BlocProvider.of<ButlerBloc>(context).dispatch(LoadButler());
-}
-
-Widget _loadingAnimation() {
-  return new Center(
-    child: new CircularProgressIndicator(),
-  );
+      BlocProvider.of<ButlerBloc>(context).add(LoadButler());
 }

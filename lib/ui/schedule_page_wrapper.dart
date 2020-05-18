@@ -16,7 +16,7 @@ class SchedulePageWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     var scheduleRepository = new ScheduleRepository();
     return RepositoryProvider(
-      builder: (context) {
+      create: (context) {
         return scheduleRepository;
       },
       child: BlocProvider.value(

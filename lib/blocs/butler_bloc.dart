@@ -15,7 +15,7 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
       : assert(butlerRepository != null);
 
   void init() {
-    dispatch(LoadButler());
+    add(LoadButler());
     _refreshButlerOnUpdatesReceived();
   }
 
@@ -67,6 +67,6 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
   void _refreshButlerOnUpdatesReceived() {
     butlerRepository
         .butlerUpdatedStream()
-        .listen((_) => dispatch(RefreshButler()));
+        .listen((_) => add(RefreshButler()));
   }
 }

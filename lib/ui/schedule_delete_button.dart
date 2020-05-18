@@ -30,8 +30,7 @@ class ScheduleDeleteButton extends StatelessWidget {
   }
 
   void _dispatchEvent(BuildContext context, ButlerEvent event) {
-    var butlerBloc = BlocProvider.of<ButlerBloc>(context);
-    butlerBloc.dispatch(event);
+    BlocProvider.of<ButlerBloc>(context).add(event);
   }
 
   void _handleDeleteError(

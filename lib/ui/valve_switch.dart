@@ -31,8 +31,7 @@ class ValveSwitch extends StatelessWidget {
   }
 
   void _dispatchEvent(BuildContext context, ButlerEvent event) {
-    var butlerBloc = BlocProvider.of<ButlerBloc>(context);
-    butlerBloc.dispatch(event);
+    BlocProvider.of<ButlerBloc>(context).add(event);
   }
 
   ToggleValveEvent _createToggleEvent(Pin pin) {

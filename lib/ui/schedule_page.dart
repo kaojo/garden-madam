@@ -40,8 +40,8 @@ class SchedulePage extends StatelessWidget {
                 // parse Schedule
                 var schedule = _parseSchedule(scheduleState);
                 // "Fire add schedule event"
-                var bloc = BlocProvider.of<ButlerBloc>(context);
-                bloc.dispatch(CreateScheduleEvent(schedule));
+                BlocProvider.of<ButlerBloc>(context).add(
+                    CreateScheduleEvent(schedule));
                 // navigate back
                 Navigator.of(context).pop();
               }
@@ -92,8 +92,7 @@ class SchedulePage extends StatelessWidget {
   }
 
   void _dispatchEvent(BuildContext context, ScheduleEvent event) {
-    var bloc = BlocProvider.of<ScheduleBloc>(context);
-    bloc.dispatch(event);
+    BlocProvider.of<ScheduleBloc>(context).add(event);
   }
 
   bool _isValidSchedule(ScheduleState scheduleState) {

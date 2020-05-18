@@ -28,13 +28,13 @@ class OverviewPageWrapper extends StatelessWidget {
     var butlerId = "local";
     var butlerName = "Virtueller Dev Buttler";
     return RepositoryProvider(
-      builder: (context) {
+      create: (context) {
         ButlerRepository butlerRepository = _buildButlerRepository(context);
         butlerRepository.connect(Butler(butlerId, butlerName));
         return butlerRepository;
       },
       child: BlocProvider(
-        builder: (context) {
+        create: (context) {
           var bloc = ButlerBloc(
             butlerRepository: RepositoryProvider.of<ButlerRepository>(context),
           );

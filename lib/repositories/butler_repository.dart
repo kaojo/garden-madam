@@ -117,12 +117,7 @@ class ButlerRepository {
 
   Future<void> _refresh() async {
     log('refresh');
-    if (this.mqttClient.connectionStatus == null ||
-        this.mqttClient.connectionStatus.state !=
-            MqttConnectionState.connected) {
-      log('try reconnect');
-      return _connect();
-    }
+    return _connect();
   }
 
   Future _subscribeToButlerStatusStreams(
@@ -210,12 +205,19 @@ class ButlerRepository {
     _butlerUpdated.add(_butler);
   }
 
-  Future<void> _connect() {
+  void _connect() async {
     log('Starting connection to mqtt server.');
-    return this
-        .mqttClient
-        .connect(mqttConfig.username, mqttConfig.password)
-        .then(_subscribeToButlerStatusStreams);
+
+    if (this.mqttClient.connectionStatus == null ||
+        this.mqttClient.connectionStatus.state !=
+            MqttConnectionState.connected) {}
+    if (_mqttClientIsConnected(this.mqttClient.connectionStatus)) {
+      _subscribeToButlerStatusStreams(this.mqttClient.connectionStatus);
+    } else {
+      return await this.mqttClient
+          .connect(mqttConfig.username, mqttConfig.password)
+          .then(_subscribeToButlerStatusStreams);
+    }
   }
 
   Stream<Butler> butlerUpdatedStream() {

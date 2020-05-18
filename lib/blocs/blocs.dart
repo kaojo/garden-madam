@@ -4,3 +4,6 @@ export 'butler_state.dart';
 export 'schedule_bloc.dart';
 export 'schedule_event.dart';
 export 'schedule_state.dart';
+export 'settings_bloc.dart';
+export 'settings_event.dart';
+export 'settings_state.dart';

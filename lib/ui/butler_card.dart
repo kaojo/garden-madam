@@ -51,14 +51,13 @@ class ButlerCard extends StatelessWidget {
   }
 
   void _navigateToButlerPage(BuildContext context, String butlerName) {
-    var butlerBloc = BlocProvider.of<ButlerBloc>(context);
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (BuildContext newContext) {
           return new ButlerPageWrapper(
             butlerName: butlerName,
-            butlerBloc: butlerBloc,
+            butlerBloc: BlocProvider.of<ButlerBloc>(context),
           );
         },
       ),
