@@ -12,6 +12,7 @@ import 'package:garden_madam/repositories/settings_repository.dart';
 import 'package:garden_madam/ui/mqtt_settings_form.dart';
 import 'package:garden_madam/ui/overview_page_wrapper.dart';
 
+import 'ui/scaffold.dart';
 import 'ui/theme.dart';
 
 class SimpleBlocDelegate extends BlocDelegate {
@@ -51,11 +52,11 @@ class MyApp extends StatelessWidget {
           child: BlocBuilder<SettingsBloc, SettingsState>(
             builder: (context, SettingsState state) {
               if (state is SettingsLoading) {
-                return scaffold(loadingAnimation());
+                return MyScaffold(body: loadingAnimation());
               } else if (state is SettingsError) {
-                return scaffold(Text("error"));
+                return MyScaffold(body: Text("error"));
               } else if (state is InvalidMqttSettings) {
-                return scaffold(invalidMqttSettings(context));
+                return MyScaffold(body: invalidMqttSettings(context));
               } else if (state is SettingsLoaded) {
                 return OverviewPageWrapper(
                   mqttConfig: state.mqttConfig,
@@ -121,17 +122,7 @@ _navigateToMqttSettingsForm(BuildContext context) async {
       },
     ),
   );
-  var settingsBloc = BlocProvider.of<SettingsBloc>(context);
-  settingsBloc.add(SettingsReloadEvent());
-}
-
-Widget scaffold(Widget body) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text("Garden Madam"),
-    ),
-    body: body,
-  );
+  BlocProvider.of<SettingsBloc>(context).add(SettingsReloadEvent());
 }
 
 Widget loadingAnimation() {

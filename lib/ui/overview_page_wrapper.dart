@@ -7,6 +7,8 @@ import 'package:garden_madam/repositories/butler_repository.dart';
 import 'package:garden_madam/ui/butler_card.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
+import 'scaffold.dart';
+
 class OverviewPageWrapper extends StatelessWidget {
   final MqttConfig mqttConfig;
   final MqttClient mqttClient;
@@ -16,17 +18,15 @@ class OverviewPageWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("My Buttlers"),
-      ),
+    return MyScaffold(
+      title: "My Buttlers",
       body: _butlerCard(context),
     );
   }
 
   Widget _butlerCard(BuildContext context) {
-    var butlerId = "local";
-    var butlerName = "Virtueller Dev Buttler";
+    var butlerId = "raspi";
+    var butlerName = "Balkon Butler";
     return RepositoryProvider(
       create: (context) {
         ButlerRepository butlerRepository = _buildButlerRepository(context);

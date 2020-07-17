@@ -1,10 +1,10 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:garden_madam/blocs/blocs.dart';
 import 'package:garden_madam/models/models.dart';
 
+import 'scaffold.dart';
 import 'theme.dart';
 
 class SchedulePage extends StatelessWidget {
@@ -14,10 +14,8 @@ class SchedulePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Add schedule for ${pin.displayName()}"),
-      ),
+    return MyScaffold(
+      title: "Add schedule for ${pin.displayName()}",
       body: BlocBuilder<ScheduleBloc, ScheduleState>(
         builder: (BuildContext context, ScheduleState scheduleState) {
           return ListView(
@@ -40,8 +38,8 @@ class SchedulePage extends StatelessWidget {
                 // parse Schedule
                 var schedule = _parseSchedule(scheduleState);
                 // "Fire add schedule event"
-                BlocProvider.of<ButlerBloc>(context).add(
-                    CreateScheduleEvent(schedule));
+                BlocProvider.of<ButlerBloc>(context)
+                    .add(CreateScheduleEvent(schedule));
                 // navigate back
                 Navigator.of(context).pop();
               }

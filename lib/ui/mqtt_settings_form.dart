@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:garden_madam/blocs/settings_form_bloc.dart';
 import 'package:garden_madam/repositories/settings_repository.dart';
+import 'package:garden_madam/ui/scaffold.dart';
 
 import 'loading_dialog.dart';
 
@@ -13,16 +14,14 @@ class MqttSettingsForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Mqtt Settings"),
-      ),
+    return MyScaffold(
+      title: "Mqtt Settings",
       body: BlocProvider(
         create: (context) => SettingsFormBloc(settingsRepository),
         child: Builder(
           builder: (context) {
-            final settingsFormBloc =
-                context.bloc<SettingsFormBloc>(); // ignore: close_sinks
+            final settingsFormBloc = context.bloc<
+                SettingsFormBloc>(); // ignore: close_sinks
 
             return FormBlocListener<SettingsFormBloc, String, String>(
               formBloc: settingsFormBloc,

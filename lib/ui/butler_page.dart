@@ -4,6 +4,7 @@ import 'package:garden_madam/blocs/blocs.dart';
 
 import '../main.dart';
 import 'butler_details.dart';
+import 'scaffold.dart';
 
 class ButlerPage extends StatelessWidget {
   final String butlerName;
@@ -12,10 +13,8 @@ class ButlerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(butlerName),
-      ),
+    return MyScaffold(
+      title: butlerName,
       body: RefreshIndicator(
         onRefresh: () async => _loadButler(context),
         child: BlocBuilder<ButlerBloc, ButlerState>(
