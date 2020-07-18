@@ -24,8 +24,7 @@ class SettingsFormBloc extends FormBloc<String, String> {
 
   SettingsRepository settingsRepository;
 
-  SettingsFormBloc(SettingsRepository this.settingsRepository)
-      : super(isLoading: true) {
+  SettingsFormBloc(this.settingsRepository) : super(isLoading: true) {
     addFieldBlocs(
       fieldBlocs: [hostname, port, username, password],
     );
@@ -44,7 +43,7 @@ class SettingsFormBloc extends FormBloc<String, String> {
     } catch (e) {
       log(e.runtimeType.toString());
       log(e.toString());
-      log(e.stackTrace.toString());
+      log(e.message.toString());
       emitLoadFailed();
     }
   }

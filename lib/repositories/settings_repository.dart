@@ -29,7 +29,7 @@ class SettingsRepository {
       if (error == "INVALID_MQTT_CONFIG") {
         return InvalidMqttSettingsEvent();
       }
-      log(error.stackTrace.toString());
+      log(error.toString());
       return SettingsLoadErrorEvent();
     });
   }
@@ -49,9 +49,10 @@ class SettingsRepository {
     return string == null || string.isEmpty;
   }
 
-  SettingsState reload() {
+  Future<SettingsState> reload() async {
+    await _readMqttSettings();
     this._mqttClient = _getMqttClient(_mqttConfig);
-    this._mqttClient.connect(_mqttConfig.username, _mqttConfig.password);
+    await this._mqttClient.connect(_mqttConfig.username, _mqttConfig.password);
     return SettingsLoaded(mqttConfig: _mqttConfig, mqttClient: _mqttClient);
   }
 
@@ -90,10 +91,12 @@ class SettingsRepository {
     var mqttUsername = prefs.getString("mqttUsername");
     var mqttPassword = prefs.getString("mqttPassword");
 
-    this._mqttConfig.hostname = mqttHost;
+    this._mqttConfig.hostname = mqttHost != null ? mqttHost.trim() : null;
     this._mqttConfig.port = mqttPort;
-    this._mqttConfig.username = mqttUsername;
-    this._mqttConfig.password = mqttPassword;
+    this._mqttConfig.username =
+        mqttUsername != null ? mqttUsername.trim() : null;
+    this._mqttConfig.password =
+        mqttPassword != null ? mqttPassword.trim() : null;
 
     return this._mqttConfig;
   }
@@ -101,9 +104,12 @@ class SettingsRepository {
   Future<void> save(
       String hostname, int port, String username, String password) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("mqttHost", hostname);
+    await prefs.setString(
+        "mqttHost", hostname != null ? hostname.trim() : null);
     await prefs.setInt("mqttPort", port);
-    await prefs.setString("mqttUsername", username);
-    await prefs.setString("mqttPassword", password);
+    await prefs.setString(
+        "mqttUsername", username != null ? username.trim() : null);
+    await prefs.setString(
+        "mqttPassword", password != null ? password.trim() : null);
   }
 }
