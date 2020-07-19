@@ -10,40 +10,48 @@ import 'valve_schedule_add_button.dart';
 
 class ValvePage extends StatelessWidget {
   final Pin pin;
+  final String errorMessage;
 
-  const ValvePage({Key key, this.pin}) : super(key: key);
+  const ValvePage({Key key, this.pin, this.errorMessage}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var list = List<Widget>();
+    if (errorMessage != null) {
+      list.add(Text(errorMessage));
+    }
+    list.addAll(
+      <Widget>[
+        ValveDetailImageComposition(pin: pin),
+        ListTile(
+          leading: ValveSwitch(pin),
+          title: Text(
+            "On/Off",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          trailing: Text("00:00:00"),
+        ),
+        Divider(
+          thickness: 2.0,
+        ),
+        Container(
+          alignment: Alignment.center,
+          child: Text(
+            "Schedules",
+            textScaleFactor: 1.5,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        ...getScheduleListTiles(),
+        AddScheduleButton(
+          pin: pin,
+        ),
+      ],
+    );
     return MyScaffold(
       title: pin.displayName(),
       body: ListView(
-        children: <Widget>[
-          ValveDetailImageComposition(pin: pin),
-          ListTile(
-            leading: ValveSwitch(pin),
-            title: Text(
-              "On/Off",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text("00:00:00"),
-          ),
-          Divider(
-            thickness: 2.0,
-          ),
-          Container(
-            alignment: Alignment.center,
-            child: Text(
-              "Schedules",
-              textScaleFactor: 1.5,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          ...getScheduleListTiles(),
-          AddScheduleButton(
-            pin: pin,
-          ),
-        ],
+        children: list,
       ),
     );
   }

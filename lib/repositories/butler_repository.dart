@@ -51,7 +51,7 @@ class ButlerRepository {
           return doTurnOff(pin);
         });
       });
-    } on Exception catch (e) {
+    } catch (e) {
       log("Could not turn off valve " + pin.displayName(), error: e);
       throw new ButlerInteractionError(_butler);
     }
@@ -59,14 +59,16 @@ class ButlerRepository {
   }
 
   Future<Butler> turnOnWithRetry(Pin pin) async {
+    log("turn on with retry");
     try {
-      await doTurnOn(pin).catchError((error) async {
-        log("Could not turn on valve " + pin.displayName(), error: error);
-        await _refresh().then((_) {
-          return doTurnOn(pin);
-        });
-      });
-    } on Exception catch (e) {
+      try {
+        await doTurnOn(pin);
+      } catch (e) {
+        log("Could not turn on valve " + pin.displayName(), error: e);
+        await _refresh();
+        await doTurnOn(pin);
+      }
+    } catch (e) {
       log("Could not turn on valve " + pin.displayName(), error: e);
       throw new ButlerInteractionError(_butler);
     }
@@ -122,7 +124,7 @@ class ButlerRepository {
         ._butlerWateringScheduleStatusMqttClient
         .createSchedule(this._butler.id, mqttSchedule)
         .then((_) =>
-        this._butler.findPin(schedule.valvePin).addSchedule(schedule));
+            this._butler.findPin(schedule.valvePin).addSchedule(schedule));
 
     return _butler;
   }

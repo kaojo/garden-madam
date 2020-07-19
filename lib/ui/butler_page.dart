@@ -21,18 +21,19 @@ class ButlerPage extends StatelessWidget {
           builder: (BuildContext context, ButlerState state) {
             if (state is ButlerError) {
               if (state.butler != null) {
-                // TODO display error message somehow
-                return ButlerDetailsPage(state.butler);
+                return ButlerDetailsPage(
+                  state.butler,
+                  errorMessage: state.errorMessage,
+                );
               }
             } else if (state is ButlerLoaded) {
               return ButlerDetailsPage(state.butler);
             } else if (state is ButlerLoading) {
               return loadingAnimation();
             }
-            // TODO make this more pretty and refreshable
             return ListView(
               children: <Widget>[
-                Text('No Data'),
+                Text('An unknown error occurred.'),
               ],
             );
           },

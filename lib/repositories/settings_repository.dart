@@ -5,6 +5,7 @@ import 'package:garden_madam/blocs/blocs.dart';
 import 'package:garden_madam/blocs/settings_state.dart';
 import 'package:garden_madam/mqtt.dart';
 import 'package:mqtt_client/mqtt_client.dart';
+import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -69,9 +70,10 @@ class SettingsRepository {
   }
 
   MqttClient _getMqttClient(MqttConfig mqttConfig) {
-    var mqttClient = MqttClient.withPort(
+    var mqttClient = MqttServerClient.withPort(
         mqttConfig.hostname, mqttConfig.client_id, mqttConfig.port);
     mqttClient.secure = true;
+    mqttClient.autoReconnect = true;
     mqttClient.onConnected = _onConnected;
     mqttClient.onSubscribed = _onSubscribed;
     //mqttClient.logging(on: true);

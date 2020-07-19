@@ -11,8 +11,9 @@ class ButlerLoading extends ButlerState {}
 
 class ButlerError extends ButlerState {
   final Butler butler;
+  final String errorMessage;
 
-  const ButlerError({this.butler});
+  const ButlerError(this.errorMessage, {this.butler});
 }
 
 class ButlerLoaded extends ButlerState {

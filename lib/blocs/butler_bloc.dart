@@ -59,11 +59,12 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
         yield ButlerLoaded(butler: butler);
       }
     } catch (e) {
+      var errorMessage = "Could not perform action" + event.toString();
+      log(errorMessage, error: e);
       if (e is ButlerInteractionError) {
-        yield ButlerError(butler: e.butler);
+        yield ButlerError(errorMessage, butler: e.butler);
       } else {
-        log("Could not handle event: " + event.toString(), error: e);
-        yield ButlerError(butler: null);
+        yield ButlerError(errorMessage, butler: null);
       }
     }
   }

@@ -6,16 +6,24 @@ import 'butler_detail_image_composition.dart';
 
 class ButlerDetailsPage extends StatelessWidget {
   final Butler _butler;
+  String errorMessage;
 
-  ButlerDetailsPage(this._butler);
+  ButlerDetailsPage(this._butler, {this.errorMessage});
 
   @override
   Widget build(BuildContext context) {
+    var list = List<Widget>();
+    if (this.errorMessage != null) {
+      final snackBar = Text(errorMessage);
+      list.add(snackBar);
+      //Scaffold.of(context).showSnackBar(snackBar);
+    }
+
+    list.add(new ButlerDetailImageComposition(butler: _butler));
+    list.addAll(_getValves(_butler));
+
     return ListView(
-      children: <Widget>[
-        new ButlerDetailImageComposition(butler: _butler),
-        ..._getValves(_butler)
-      ],
+      children: list,
     );
   }
 

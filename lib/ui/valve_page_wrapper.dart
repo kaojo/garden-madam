@@ -18,24 +18,24 @@ class ValvePageWrapper extends StatelessWidget {
       child: BlocBuilder<ButlerBloc, ButlerState>(
         builder: (BuildContext context, ButlerState state) {
           if (state is ButlerError) {
-            return ListView(
-              children: <Widget>[
-                Text('Error'),
-              ],
-            );
+            if (state.butler != null) {
+              return ValvePage(
+                pin: pin,
+                errorMessage: state.errorMessage,
+              );
+            }
           } else if (state is ButlerLoaded) {
             return ValvePage(
               pin: pin,
             );
           } else if (state is ButlerLoading) {
             return _loadingAnimation();
-          } else {
-            return ListView(
-              children: <Widget>[
-                Text('No Data'),
-              ],
-            );
           }
+          return ListView(
+            children: <Widget>[
+              Text('No Data'),
+            ],
+          );
         },
       ),
     );
