@@ -16,7 +16,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         add(event);
       },
       onError: (error) {
-        log(error.toString());
+        log(error.toString(), error: error);
         add(SettingsLoadErrorEvent());
       },
     );
@@ -26,6 +26,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   @override
   Stream<SettingsState> mapEventToState(SettingsEvent event) async* {
     if (event is SettingsReloadEvent) {
+      yield SettingsLoading();
       yield await this._settingsRepository.reload();
     } else if (event is SettingsLoadedEvent) {
       yield this._settingsRepository.settingsState();

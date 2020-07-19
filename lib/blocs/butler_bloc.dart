@@ -59,14 +59,16 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
         yield ButlerLoaded(butler: butler);
       }
     } catch (e) {
-      log(e.toString());
-      yield ButlerError();
+      if (e is ButlerInteractionError) {
+        yield ButlerError(butler: e.butler);
+      } else {
+        log("Could not handle event: " + event.toString(), error: e);
+        yield ButlerError(butler: null);
+      }
     }
   }
 
   void _refreshButlerOnUpdatesReceived() {
-    butlerRepository
-        .butlerUpdatedStream()
-        .listen((_) => add(RefreshButler()));
+    butlerRepository.butlerUpdatedStream().listen((_) => add(RefreshButler()));
   }
 }

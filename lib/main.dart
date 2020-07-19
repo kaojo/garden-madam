@@ -25,10 +25,15 @@ class SimpleBlocDelegate extends BlocDelegate {
 
 void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
-  runApp(MyApp());
+  var settingsRepository = new SettingsRepository();
+  runApp(MyApp(settingsRepository: settingsRepository));
 }
 
 class MyApp extends StatelessWidget {
+  final SettingsRepository settingsRepository;
+
+  const MyApp({Key key, this.settingsRepository}) : super(key: key);
+
 // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -39,8 +44,7 @@ class MyApp extends StatelessWidget {
       ),
       home: RepositoryProvider(
         create: (context) {
-          SettingsRepository repository = new SettingsRepository();
-          return repository;
+          return settingsRepository;
         },
         child: BlocProvider(
           create: (context) {
@@ -49,66 +53,94 @@ class MyApp extends StatelessWidget {
             );
             return bloc;
           },
-          child: BlocBuilder<SettingsBloc, SettingsState>(
-            builder: (context, SettingsState state) {
-              if (state is SettingsLoading) {
-                return MyScaffold(body: loadingAnimation());
-              } else if (state is SettingsError) {
-                return MyScaffold(body: Text("error"));
-              } else if (state is InvalidMqttSettings) {
-                return MyScaffold(body: invalidMqttSettings(context));
-              } else if (state is SettingsLoaded) {
-                return OverviewPageWrapper(
-                  mqttConfig: state.mqttConfig,
-                  mqttClient: state.mqttClient,
-                );
-              }
-              return Text("error");
-            },
+          child: MyScaffold(
+            title: "Garden Madam",
+            body: BlocBuilder<SettingsBloc, SettingsState>(
+              builder: (context, SettingsState state) {
+                if (state is SettingsLoading) {
+                  return loadingAnimation();
+                } else if (state is SettingsError) {
+                  return _errorMessageWithReload(context, "SettingsError");
+                } else if (state is InvalidMqttSettings) {
+                  return invalidMqttSettings(context);
+                } else if (state is SettingsLoaded) {
+                  return OverviewPageWrapper(
+                    mqttConfig: state.mqttConfig,
+                    mqttClient: state.mqttClient,
+                  );
+                }
+                return _errorMessageWithReload(
+                    context, "Unknown error detected.");
+              },
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget invalidMqttSettings(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(10),
-          child: Center(
-            child: Text(
-              "Invalid MQTT settings",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 28),
-            ),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.all(10),
-          child: Center(
-            child: RichText(
-              text: TextSpan(
-                  text:
-                  "In order to connect to your garden buttler, the garden madam need to connect to the same MQTT message broker. Please provide valid credentials.",
-                  style: TextStyle(fontSize: 20, color: Colors.blueGrey),
-                  children: []),
-            ),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.all(10),
-          child: Center(
-            child: RaisedButton(
-              onPressed: () => _navigateToMqttSettingsForm(context),
-              child: Text('Edit mqtt settings'),
-            ),
-          ),
-        )
-      ],
+  RefreshIndicator _errorMessageWithReload(
+      BuildContext context, String errorMessage) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        return await _reloadSettings(context);
+      },
+      child: ListView(
+        children: <Widget>[
+          Text(errorMessage),
+        ],
+      ),
     );
+  }
+
+  Widget invalidMqttSettings(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        return await _reloadSettings(context);
+      },
+      child: ListView(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: Text(
+                "Invalid MQTT settings",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28),
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: RichText(
+                text: TextSpan(
+                    text:
+                        "In order to connect to your garden buttler, the garden madam need to connect to the same MQTT message broker. Please provide valid credentials.",
+                    style: TextStyle(fontSize: 20, color: Colors.blueGrey),
+                    children: []),
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: RaisedButton(
+                onPressed: () => _navigateToMqttSettingsForm(context),
+                child: Text('Edit mqtt settings'),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  _reloadSettings(BuildContext context) async {
+    log("reload settings on refresh.");
+    BlocProvider.of<SettingsBloc>(context).add(SettingsReloadEvent());
   }
 }
 

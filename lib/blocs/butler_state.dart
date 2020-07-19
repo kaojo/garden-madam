@@ -9,7 +9,11 @@ class ButlerEmpty extends ButlerState {}
 
 class ButlerLoading extends ButlerState {}
 
-class ButlerError extends ButlerState {}
+class ButlerError extends ButlerState {
+  final Butler butler;
+
+  const ButlerError({this.butler});
+}
 
 class ButlerLoaded extends ButlerState {
   final Butler butler;

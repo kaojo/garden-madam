@@ -44,24 +44,32 @@ class ButlerRepository {
   }
 
   Future<Butler> turnOffWithRetry(Pin pin) async {
-    await doTurnOff(pin).catchError((error) {
-      log(error);
-      _refresh().then((_) {
-        return doTurnOff(pin)
-            .catchError((error) => log("TODO: handle retry error"));
+    try {
+      await doTurnOff(pin).catchError((error) async {
+        log("Could not turn off valve " + pin.displayName(), error: error);
+        await _refresh().then((_) {
+          return doTurnOff(pin);
+        });
       });
-    });
+    } on Exception catch (e) {
+      log("Could not turn off valve " + pin.displayName(), error: e);
+      throw new ButlerInteractionError(_butler);
+    }
     return _butler;
   }
 
   Future<Butler> turnOnWithRetry(Pin pin) async {
-    await doTurnOn(pin).catchError((error) {
-      log(error);
-      _refresh().then((_) {
-        return doTurnOn(pin)
-            .catchError((error) => log("TODO: handle retry error"));
+    try {
+      await doTurnOn(pin).catchError((error) async {
+        log("Could not turn on valve " + pin.displayName(), error: error);
+        await _refresh().then((_) {
+          return doTurnOn(pin);
+        });
       });
-    });
+    } on Exception catch (e) {
+      log("Could not turn on valve " + pin.displayName(), error: e);
+      throw new ButlerInteractionError(_butler);
+    }
     return _butler;
   }
 
@@ -103,7 +111,7 @@ class ButlerRepository {
         ._butlerWateringScheduleStatusMqttClient
         .deleteSchedule(this._butler.id, mqttSchedule)
         .then((_) =>
-        this._butler.findPin(schedule.valvePin).removeSchedule(schedule));
+            this._butler.findPin(schedule.valvePin).removeSchedule(schedule));
 
     return _butler;
   }
@@ -250,4 +258,10 @@ class ButlerRepository {
             schedule.endTime.hour, schedule.endTime.minute),
         schedule.enabled);
   }
+}
+
+class ButlerInteractionError extends Error {
+  final Butler butler;
+
+  ButlerInteractionError(this.butler);
 }

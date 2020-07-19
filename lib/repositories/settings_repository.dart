@@ -29,7 +29,7 @@ class SettingsRepository {
       if (error == "INVALID_MQTT_CONFIG") {
         return InvalidMqttSettingsEvent();
       }
-      log(error.toString());
+      log(error.toString(), error: error);
       return SettingsLoadErrorEvent();
     });
   }
@@ -50,10 +50,18 @@ class SettingsRepository {
   }
 
   Future<SettingsState> reload() async {
-    await _readMqttSettings();
-    this._mqttClient = _getMqttClient(_mqttConfig);
-    await this._mqttClient.connect(_mqttConfig.username, _mqttConfig.password);
-    return SettingsLoaded(mqttConfig: _mqttConfig, mqttClient: _mqttClient);
+    try {
+      await _readMqttSettings();
+      this._mqttClient = _getMqttClient(_mqttConfig);
+      await this
+          ._mqttClient
+          .connect(_mqttConfig.username, _mqttConfig.password);
+    } catch (e) {
+      log("Cloud not reload settings", error: e);
+      return SettingsError();
+    }
+    return SettingsLoaded(
+        mqttClient: this._mqttClient, mqttConfig: this._mqttConfig);
   }
 
   SettingsState settingsState() {

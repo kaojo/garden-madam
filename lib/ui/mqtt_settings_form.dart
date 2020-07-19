@@ -8,7 +8,7 @@ import 'package:garden_madam/ui/scaffold.dart';
 import 'loading_dialog.dart';
 
 class MqttSettingsForm extends StatelessWidget {
-  SettingsRepository settingsRepository;
+  final SettingsRepository settingsRepository;
 
   MqttSettingsForm(this.settingsRepository);
 
@@ -20,8 +20,8 @@ class MqttSettingsForm extends StatelessWidget {
         create: (context) => SettingsFormBloc(settingsRepository),
         child: Builder(
           builder: (context) {
-            final settingsFormBloc = context.bloc<
-                SettingsFormBloc>(); // ignore: close_sinks
+            // ignore: close_sinks
+            final settingsFormBloc = context.bloc<SettingsFormBloc>();
 
             return FormBlocListener<SettingsFormBloc, String, String>(
               formBloc: settingsFormBloc,

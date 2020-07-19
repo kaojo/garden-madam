@@ -20,22 +20,21 @@ class ButlerPage extends StatelessWidget {
         child: BlocBuilder<ButlerBloc, ButlerState>(
           builder: (BuildContext context, ButlerState state) {
             if (state is ButlerError) {
-              return ListView(
-                children: <Widget>[
-                  Text('Error'),
-                ],
-              );
+              if (state.butler != null) {
+                // TODO display error message somehow
+                return ButlerDetailsPage(state.butler);
+              }
             } else if (state is ButlerLoaded) {
               return ButlerDetailsPage(state.butler);
             } else if (state is ButlerLoading) {
               return loadingAnimation();
-            } else {
-              return ListView(
-                children: <Widget>[
-                  Text('No Data'),
-                ],
-              );
             }
+            // TODO make this more pretty and refreshable
+            return ListView(
+              children: <Widget>[
+                Text('No Data'),
+              ],
+            );
           },
         ),
       ),
