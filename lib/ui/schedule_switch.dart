@@ -8,7 +8,7 @@ import 'package:garden_madam/models/models.dart';
 class ScheduleSwitch extends StatelessWidget {
   final Schedule _schedule;
 
-  ScheduleSwitch(this._schedule);
+  const ScheduleSwitch(this._schedule);
 
   @override
   Widget build(BuildContext context) {

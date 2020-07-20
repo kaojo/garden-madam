@@ -9,7 +9,7 @@ import 'package:garden_madam/ui/valve_page_wrapper.dart';
 class ValvesListItem extends StatelessWidget {
   final Pin _pin;
 
-  ValvesListItem(this._pin);
+  const ValvesListItem(this._pin);
 
   @override
   Widget build(BuildContext context) {

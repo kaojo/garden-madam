@@ -6,9 +6,9 @@ import 'butler_detail_image_composition.dart';
 
 class ButlerDetailsPage extends StatelessWidget {
   final Butler _butler;
-  String errorMessage;
+  final String errorMessage;
 
-  ButlerDetailsPage(this._butler, {this.errorMessage});
+  const ButlerDetailsPage(this._butler, {this.errorMessage});
 
   @override
   Widget build(BuildContext context) {

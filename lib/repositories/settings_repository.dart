@@ -92,21 +92,16 @@ class SettingsRepository {
   Future<MqttConfig> mqttConfig() async {
     final prefs = await SharedPreferences.getInstance();
 
-    if (_mqttConfig == null) {
-      this._mqttConfig = MqttConfig(uuid.v1());
-    }
-
     var mqttHost = prefs.getString("mqttHost");
     var mqttPort = prefs.getInt("mqttPort");
     var mqttUsername = prefs.getString("mqttUsername");
     var mqttPassword = prefs.getString("mqttPassword");
 
-    this._mqttConfig.hostname = mqttHost != null ? mqttHost.trim() : null;
-    this._mqttConfig.port = mqttPort;
-    this._mqttConfig.username =
-        mqttUsername != null ? mqttUsername.trim() : null;
-    this._mqttConfig.password =
-        mqttPassword != null ? mqttPassword.trim() : null;
+    this._mqttConfig = MqttConfig(uuid.v1(),
+        hostname: mqttHost != null ? mqttHost.trim() : null,
+        port: mqttPort,
+        username: mqttUsername != null ? mqttUsername.trim() : null,
+        password: mqttPassword != null ? mqttPassword.trim() : null);
 
     return this._mqttConfig;
   }

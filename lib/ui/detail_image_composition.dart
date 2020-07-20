@@ -6,7 +6,8 @@ class DetailImageComposition extends StatelessWidget {
   final Color onColor;
   final Color offColor;
 
-  DetailImageComposition({@required this.child, @required this.status, onColor, offColor})
+  const DetailImageComposition(
+      {@required this.child, @required this.status, onColor, offColor})
       : this.onColor = onColor != null ? onColor : Colors.green,
         this.offColor = offColor != null ? offColor : Colors.red;
 

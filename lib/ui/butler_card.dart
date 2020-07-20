@@ -7,6 +7,8 @@ import 'butler_detail_image_composition.dart';
 import 'butler_page_wrapper.dart';
 
 class ButlerCard extends StatelessWidget {
+  const ButlerCard();
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ButlerBloc, ButlerState>(

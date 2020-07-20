@@ -10,7 +10,7 @@ import 'loading_dialog.dart';
 class MqttSettingsForm extends StatelessWidget {
   final SettingsRepository settingsRepository;
 
-  MqttSettingsForm(this.settingsRepository);
+  const MqttSettingsForm(this.settingsRepository);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class MqttSettingsForm extends StatelessWidget {
               onSuccess: (context, state) {
                 LoadingDialog.hide(context);
 
-                Navigator.of(context).pop();
+                Navigator.of(context).pop("SUCCESS");
               },
               onFailure: (context, state) {
                 LoadingDialog.hide(context);

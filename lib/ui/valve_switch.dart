@@ -10,7 +10,7 @@ import 'theme.dart';
 class ValveSwitch extends StatelessWidget {
   final Pin _pin;
 
-  ValveSwitch(this._pin);
+  const ValveSwitch(this._pin);
 
   @override
   Widget build(BuildContext context) {

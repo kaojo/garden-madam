@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
@@ -10,6 +11,8 @@ import 'butler_state.dart';
 
 class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
   final ButlerRepository butlerRepository;
+
+  StreamSubscription<Butler> subscription;
 
   ButlerBloc({@required this.butlerRepository})
       : assert(butlerRepository != null);
@@ -70,6 +73,14 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
   }
 
   void _refreshButlerOnUpdatesReceived() {
-    butlerRepository.butlerUpdatedStream().listen((_) => add(RefreshButler()));
+    this.subscription = butlerRepository
+        .butlerUpdatedStream()
+        .listen((_) => add(RefreshButler()));
+  }
+
+  @override
+  Future<Function> close() {
+    butlerRepository.close();
+    subscription.cancel();
   }
 }

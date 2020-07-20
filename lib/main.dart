@@ -37,23 +37,23 @@ class MyApp extends StatelessWidget {
 // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Garden Madam',
-      theme: ThemeData(
-        primarySwatch: APPBAR_COLOR,
-      ),
-      home: RepositoryProvider(
+    return RepositoryProvider(
+      create: (context) {
+        return settingsRepository;
+      },
+      child: BlocProvider(
         create: (context) {
-          return settingsRepository;
+          var bloc = SettingsBloc(
+            RepositoryProvider.of<SettingsRepository>(context),
+          );
+          return bloc;
         },
-        child: BlocProvider(
-          create: (context) {
-            var bloc = SettingsBloc(
-              RepositoryProvider.of<SettingsRepository>(context),
-            );
-            return bloc;
-          },
-          child: MyScaffold(
+        child: MaterialApp(
+          title: 'Garden Madam',
+          theme: ThemeData(
+            primarySwatch: APPBAR_COLOR,
+          ),
+          home: MyScaffold(
             title: "Garden Madam",
             body: BlocBuilder<SettingsBloc, SettingsState>(
               builder: (context, SettingsState state) {

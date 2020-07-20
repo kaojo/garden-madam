@@ -6,7 +6,7 @@ class MyScaffold extends StatelessWidget {
   final Widget body;
   final String title;
 
-  MyScaffold({this.body, this.title = "Garden Madam"});
+  const MyScaffold({this.body, this.title = "Garden Madam"});
 
   @override
   Widget build(BuildContext context) {

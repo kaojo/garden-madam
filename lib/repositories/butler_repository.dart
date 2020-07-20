@@ -152,8 +152,7 @@ class ButlerRepository {
           .getHealthStatus(this._butler.id)
           .forEach(_updateFromHealthStatus);
     } else {
-      log(
-          'Error detected. Subscription to mqtt topics attempted on a invalid connection.');
+      log('Error detected. Subscription to mqtt topics attempted on a invalid connection.');
       log('$status');
       if (status != null) log('${status.state}');
       log(this.mqttClient.connectionStatus.returnCode.toString());
@@ -259,6 +258,12 @@ class ButlerRepository {
         MqttSchedule(schedule.startTime.hour, schedule.startTime.minute,
             schedule.endTime.hour, schedule.endTime.minute),
         schedule.enabled);
+  }
+
+  void close() {
+    // set autoRreconnect to false because otherwise an error would be thrown here: package:mqtt_client/src/mqtt_client.dart:327:30
+    this.mqttClient.autoReconnect = false;
+    this.mqttClient.disconnect();
   }
 }
 

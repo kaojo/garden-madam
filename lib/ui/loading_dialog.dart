@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class LoadingDialog extends StatelessWidget {
+  const LoadingDialog({Key key}) : super(key: key);
+
   static void show(BuildContext context, {Key key}) => showDialog<void>(
         context: context,
         useRootNavigator: false,
@@ -9,8 +11,6 @@ class LoadingDialog extends StatelessWidget {
       ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
 
   static void hide(BuildContext context) => Navigator.pop(context);
-
-  LoadingDialog({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

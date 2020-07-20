@@ -9,7 +9,7 @@ import 'scaffold.dart';
 class ButlerPage extends StatelessWidget {
   final String butlerName;
 
-  ButlerPage(this.butlerName);
+  const ButlerPage(this.butlerName);
 
   @override
   Widget build(BuildContext context) {

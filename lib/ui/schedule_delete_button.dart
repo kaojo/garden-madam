@@ -8,7 +8,7 @@ import 'package:garden_madam/models/models.dart';
 class ScheduleDeleteButton extends StatelessWidget {
   final Schedule _schedule;
 
-  ScheduleDeleteButton(this._schedule);
+  const ScheduleDeleteButton(this._schedule);
 
   @override
   Widget build(BuildContext context) {
