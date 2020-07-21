@@ -17,7 +17,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       },
       onError: (error) {
         log(error.toString(), error: error);
-        add(SettingsLoadErrorEvent());
+        add(SettingsLoadErrorEvent(error.toString()));
       },
     );
     return SettingsLoading();
@@ -31,7 +31,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     } else if (event is SettingsLoadedEvent) {
       yield this._settingsRepository.settingsState();
     } else if (event is SettingsLoadErrorEvent) {
-      yield new SettingsError();
+      yield new SettingsError(event.errorMessage);
     } else if (event is InvalidMqttSettingsEvent) {
       yield InvalidMqttSettings();
     }

@@ -5,6 +5,7 @@ import 'package:garden_madam/blocs/butler_state.dart';
 
 import 'butler_detail_image_composition.dart';
 import 'butler_page_wrapper.dart';
+import 'error_message.dart';
 
 class ButlerCard extends StatelessWidget {
   const ButlerCard();
@@ -16,7 +17,7 @@ class ButlerCard extends StatelessWidget {
         if (state is ButlerError) {
           return ListView(
             children: <Widget>[
-              Text('Error'),
+              ErrorMessage(state.errorMessage),
             ],
           );
         } else if (state is ButlerLoaded) {
@@ -44,7 +45,7 @@ class ButlerCard extends StatelessWidget {
         } else {
           return ListView(
             children: <Widget>[
-              Text('No Data'),
+              ErrorMessage("Unknown state."),
             ],
           );
         }

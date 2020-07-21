@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:garden_madam/blocs/blocs.dart';
@@ -21,43 +19,11 @@ class ScheduleDeleteButton extends StatelessWidget {
   }
 
   deleteSchedule(BuildContext context, Schedule schedule) {
-    try {
-      DeleteScheduleEvent event = DeleteScheduleEvent(schedule);
-      _dispatchEvent(context, event);
-    } on Exception catch (e) {
-      _handleDeleteError(context, _schedule, e);
-    }
+    DeleteScheduleEvent event = DeleteScheduleEvent(schedule);
+    _dispatchEvent(context, event);
   }
 
   void _dispatchEvent(BuildContext context, ButlerEvent event) {
     BlocProvider.of<ButlerBloc>(context).add(event);
-  }
-
-  void _handleDeleteError(
-      BuildContext context, Schedule schedule, Exception e) {
-    log(e.toString());
-    _displayErrorDialog(context);
-  }
-
-  void _displayErrorDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Connection Error"),
-          content: new Text("Could not reach your butler. Try again later."),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 }

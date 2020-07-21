@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:garden_madam/blocs/blocs.dart';
+import 'package:garden_madam/ui/error_message.dart';
 
 import '../main.dart';
 import 'butler_details.dart';
@@ -33,7 +34,7 @@ class ButlerPage extends StatelessWidget {
             }
             return ListView(
               children: <Widget>[
-                Text('An unknown error occurred.'),
+                ErrorMessage('An unknown error occurred.'),
               ],
             );
           },

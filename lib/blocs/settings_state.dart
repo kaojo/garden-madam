@@ -9,7 +9,11 @@ class SettingsLoading extends SettingsState {}
 
 class InvalidMqttSettings extends SettingsState {}
 
-class SettingsError extends SettingsState {}
+class SettingsError extends SettingsState {
+  final String errorMessage;
+
+  const SettingsError(this.errorMessage);
+}
 
 class SettingsLoaded extends SettingsState {
   MqttConfig mqttConfig;

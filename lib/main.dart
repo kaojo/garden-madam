@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:garden_madam/blocs/blocs.dart';
 import 'package:garden_madam/repositories/settings_repository.dart';
+import 'package:garden_madam/ui/error_message.dart';
 import 'package:garden_madam/ui/mqtt_settings_form.dart';
 import 'package:garden_madam/ui/overview_page_wrapper.dart';
 
@@ -60,7 +61,7 @@ class MyApp extends StatelessWidget {
                 if (state is SettingsLoading) {
                   return loadingAnimation();
                 } else if (state is SettingsError) {
-                  return _errorMessageWithReload(context, "SettingsError");
+                  return _errorMessageWithReload(context, state.errorMessage);
                 } else if (state is InvalidMqttSettings) {
                   return invalidMqttSettings(context);
                 } else if (state is SettingsLoaded) {
@@ -87,7 +88,7 @@ class MyApp extends StatelessWidget {
       },
       child: ListView(
         children: <Widget>[
-          Text(errorMessage),
+          ErrorMessage(errorMessage),
         ],
       ),
     );

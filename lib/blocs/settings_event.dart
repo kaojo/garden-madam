@@ -6,6 +6,10 @@ class SettingsReloadEvent extends SettingsEvent {}
 
 class SettingsLoadedEvent extends SettingsEvent {}
 
-class SettingsLoadErrorEvent extends SettingsEvent {}
+class SettingsLoadErrorEvent extends SettingsEvent {
+  final String errorMessage;
+
+  const SettingsLoadErrorEvent(this.errorMessage);
+}
 
 class InvalidMqttSettingsEvent extends SettingsEvent {}

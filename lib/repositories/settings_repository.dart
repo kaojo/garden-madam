@@ -14,25 +14,34 @@ class SettingsRepository {
   MqttClient _mqttClient;
   Uuid uuid = Uuid();
 
-  Future<SettingsEvent> init() {
-    return _readMqttSettings().then((value) {
-      this._mqttClient = _getMqttClient(_mqttConfig);
-      return this
-          ._mqttClient
-          .connect(_mqttConfig.username, _mqttConfig.password);
-    }).then((value) {
-      if (value.state == MqttConnectionState.connected ||
-          value.state == MqttConnectionState.connecting) {
-        return SettingsLoadedEvent();
-      }
-      return InvalidMqttSettingsEvent();
-    }).catchError((error) {
+  Future<SettingsEvent> init() async {
+    try {
+      await _readMqttSettings();
+    } catch (error) {
+      log(error.toString(), error: error);
       if (error == "INVALID_MQTT_CONFIG") {
         return InvalidMqttSettingsEvent();
       }
+      return SettingsLoadErrorEvent(error.toString());
+    }
+
+    this._mqttClient = _getMqttClient(this._mqttConfig);
+
+    try {
+      await this
+          ._mqttClient
+          .connect(_mqttConfig.username, _mqttConfig.password);
+      await Future.doWhile(() async {
+        await Future.delayed(Duration(seconds: 1));
+        return this._mqttClient.connectionStatus?.state !=
+            MqttConnectionState.connected;
+      }).timeout(Duration(seconds: 5));
+      return SettingsLoadedEvent();
+    } catch (error) {
       log(error.toString(), error: error);
-      return SettingsLoadErrorEvent();
-    });
+      return SettingsLoadErrorEvent(
+          "Could not establish connection to the mqtt server.");
+    }
   }
 
   Future<MqttConfig> _readMqttSettings() async {
@@ -59,7 +68,8 @@ class SettingsRepository {
           .connect(_mqttConfig.username, _mqttConfig.password);
     } catch (e) {
       log("Cloud not reload settings", error: e);
-      return SettingsError();
+      return SettingsError(
+          "Could not establish connection to the mqtt server.");
     }
     return SettingsLoaded(
         mqttClient: this._mqttClient, mqttConfig: this._mqttConfig);
