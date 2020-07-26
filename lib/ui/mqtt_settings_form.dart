@@ -17,13 +17,13 @@ class MqttSettingsForm extends StatelessWidget {
     return MyScaffold(
       title: "Mqtt Settings",
       body: BlocProvider(
-        create: (context) => SettingsFormBloc(settingsRepository),
+        create: (context) => MqttSettingsFormBloc(settingsRepository),
         child: Builder(
           builder: (context) {
             // ignore: close_sinks
-            final settingsFormBloc = context.bloc<SettingsFormBloc>();
+            final settingsFormBloc = context.bloc<MqttSettingsFormBloc>();
 
-            return FormBlocListener<SettingsFormBloc, String, String>(
+            return FormBlocListener<MqttSettingsFormBloc, String, String>(
               formBloc: settingsFormBloc,
               onSubmitting: (context, state) {
                 LoadingDialog.show(context);
@@ -39,7 +39,7 @@ class MqttSettingsForm extends StatelessWidget {
                 Scaffold.of(context).showSnackBar(
                     SnackBar(content: Text(state.failureResponse)));
               },
-              child: BlocBuilder<SettingsFormBloc, FormBlocState>(
+              child: BlocBuilder<MqttSettingsFormBloc, FormBlocState>(
                 builder: (context, state) {
                   if (state is FormBlocLoading) {
                     return Center(child: CircularProgressIndicator());

@@ -6,9 +6,9 @@ import 'package:garden_madam/datahandlers/datahandlers.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
 import '../models/butler.dart';
+import '../models/mqtt.dart';
 import '../models/pin.dart';
 import '../models/schedule.dart';
-import '../mqtt.dart';
 
 class ButlerRepository {
   Butler _butler;

@@ -15,7 +15,7 @@ class ButlerCard extends StatelessWidget {
     return BlocBuilder<ButlerBloc, ButlerState>(
       builder: (BuildContext context, ButlerState state) {
         if (state is ButlerError) {
-          return ListView(
+          return Column(
             children: <Widget>[
               ErrorMessage(state.errorMessage),
             ],
@@ -43,7 +43,7 @@ class ButlerCard extends StatelessWidget {
         } else if (state is ButlerLoading) {
           return _loadingAnimation();
         } else {
-          return ListView(
+          return Column(
             children: <Widget>[
               ErrorMessage("Unknown state."),
             ],

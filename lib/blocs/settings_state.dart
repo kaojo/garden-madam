@@ -1,4 +1,4 @@
-import 'package:garden_madam/mqtt.dart';
+import 'package:garden_madam/models/mqtt.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
 abstract class SettingsState {
@@ -25,14 +25,25 @@ class SettingsLoaded extends SettingsState {
 
 class ButlerConfig {
   String id;
+  String name;
   List<PinConfig> pinConfigs;
 
-  ButlerConfig(this.id, this.pinConfigs);
+  ButlerConfig({this.id, this.name, this.pinConfigs});
+
+  @override
+  String toString() {
+    return '{"id": "$id", "name": "$name", "pinConfigs": $pinConfigs}';
+  }
 }
 
 class PinConfig {
-  int pin;
+  int number;
   String name;
 
-  PinConfig(this.pin, this.name);
+  PinConfig({this.number, this.name});
+
+  @override
+  String toString() {
+    return '{"number": $number, "name": "$name"}';
+  }
 }

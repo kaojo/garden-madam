@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:garden_madam/repositories/settings_repository.dart';
 
-class SettingsFormBloc extends FormBloc<String, String> {
+class MqttSettingsFormBloc extends FormBloc<String, String> {
   final hostname = TextFieldBloc(
     // ignore: close_sinks
     validators: [
@@ -24,7 +24,7 @@ class SettingsFormBloc extends FormBloc<String, String> {
 
   SettingsRepository settingsRepository;
 
-  SettingsFormBloc(this.settingsRepository) : super(isLoading: true) {
+  MqttSettingsFormBloc(this.settingsRepository) : super(isLoading: true) {
     addFieldBlocs(
       fieldBlocs: [hostname, port, username, password],
     );
@@ -40,10 +40,8 @@ class SettingsFormBloc extends FormBloc<String, String> {
       username.updateInitialValue(mqttConfig.username);
       password.updateInitialValue(mqttConfig.password);
       emitLoaded();
-    } catch (e) {
-      log(e.runtimeType.toString());
-      log(e.toString());
-      log(e.message.toString());
+    } catch (e, s) {
+      log(e.toString(), error: e, stackTrace: s);
       emitLoadFailed();
     }
   }
@@ -54,7 +52,7 @@ class SettingsFormBloc extends FormBloc<String, String> {
 
     if (hostname.value != null && port.value != null) {
       try {
-        await settingsRepository.save(
+        await settingsRepository.saveMqttSettings(
             hostname.value, port.valueToInt, username.value, password.value);
       } catch (e) {
         emitFailure(failureResponse: 'Error saving mqtt settings!');

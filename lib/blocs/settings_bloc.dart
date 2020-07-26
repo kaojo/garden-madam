@@ -15,8 +15,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       (event) {
         add(event);
       },
-      onError: (error) {
-        log(error.toString(), error: error);
+      onError: (error, s) {
+        log(error.toString(), error: error, stackTrace: s);
         add(SettingsLoadErrorEvent(error.toString()));
       },
     );

@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:garden_madam/models/schedule.dart';
@@ -19,7 +18,6 @@ class Pin {
   Pin(this.valvePinNumber);
 
   void addSchedule(Schedule schedule) {
-    log("Pin: add schedule");
     if (findSchedule(schedule.startTime, schedule.endTime) == null) {
       _schedules.add(schedule);
     }
