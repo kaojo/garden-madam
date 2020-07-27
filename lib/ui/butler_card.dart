@@ -23,11 +23,12 @@ class ButlerCard extends StatelessWidget {
         } else if (state is ButlerLoaded) {
           return Container(
             padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-            height: 350,
+            height: 300,
             child: Card(
               elevation: 1,
               child: InkWell(
-                onTap: () => _navigateToButlerPage(context, state.butler.name),
+                onTap: () => _navigateToButlerPage(
+                    context, state.butler.id, state.butler.name),
                 child: Column(
                   children: <Widget>[
                     ButlerDetailImageComposition(butler: state.butler),
@@ -53,12 +54,14 @@ class ButlerCard extends StatelessWidget {
     );
   }
 
-  void _navigateToButlerPage(BuildContext context, String butlerName) {
+  void _navigateToButlerPage(BuildContext context, String butlerId,
+      String butlerName) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (BuildContext newContext) {
           return new ButlerPageWrapper(
+            butlerId: butlerId,
             butlerName: butlerName,
             butlerBloc: BlocProvider.of<ButlerBloc>(context),
           );

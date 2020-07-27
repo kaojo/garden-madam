@@ -6,9 +6,13 @@ class MyScaffold extends StatelessWidget {
   final Widget body;
   final String title;
   final FloatingActionButton floatingActionButton;
+  final List<Widget> pageDrawerItems;
 
   const MyScaffold(
-      {this.body, this.title = "Garden Madam", this.floatingActionButton});
+      {this.body,
+      this.title = "Garden Madam",
+      this.floatingActionButton,
+      this.pageDrawerItems});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +21,9 @@ class MyScaffold extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      drawer: NavigationDrawer(),
+      drawer: NavigationDrawer(
+        pageDrawerItems: pageDrawerItems,
+      ),
       floatingActionButton: floatingActionButton,
     );
   }

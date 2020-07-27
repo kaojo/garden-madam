@@ -5,16 +5,18 @@ import 'package:garden_madam/ui/butler_page.dart';
 
 class ButlerPageWrapper extends StatelessWidget {
   final ButlerBloc butlerBloc;
+  final String butlerId;
   final String butlerName;
 
-  const ButlerPageWrapper({Key key, this.butlerBloc, this.butlerName})
+  const ButlerPageWrapper(
+      {Key key, this.butlerBloc, this.butlerName, this.butlerId})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: butlerBloc,
-      child: ButlerPage(butlerName),
+      child: ButlerPage(butlerId, butlerName),
     );
   }
 

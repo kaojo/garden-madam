@@ -21,7 +21,7 @@ class ButlerDetailImageComposition extends StatelessWidget {
         status: _butler.online,
         child: SvgPicture.asset('images/butler.svg',
             semanticsLabel: 'Butler default image'),
-      ),
+        imageScale: 0.75),
     );
   }
 }

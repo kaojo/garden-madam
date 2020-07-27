@@ -34,6 +34,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       yield new SettingsError(event.errorMessage);
     } else if (event is InvalidMqttSettingsEvent) {
       yield InvalidMqttSettings();
+    } else if (event is DeleteButlerEvent) {
+      yield SettingsLoading();
+      yield await this._settingsRepository.deleteButler(event.id);
     }
   }
 }

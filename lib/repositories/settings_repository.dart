@@ -156,7 +156,10 @@ class SettingsRepository {
   }
 
   SettingsState settingsState() {
-    return SettingsLoaded(mqttConfig: _mqttConfig, mqttClient: _mqttClient);
+    return SettingsLoaded(
+        mqttConfig: _mqttConfig,
+        mqttClient: _mqttClient,
+        butlerConfigs: _butlerConfigs);
   }
 
   MqttClient _getMqttClient(MqttConfig mqttConfig) {
@@ -208,10 +211,32 @@ class SettingsRepository {
         "mqttPassword", password != null ? password.trim() : null);
   }
 
+  ButlerConfig findButler(String id) {
+    try {
+      return this._butlerConfigs.firstWhere((element) => element.id == id);
+    } catch (e) {
+      // no element found
+    }
+    return null;
+  }
+
   saveButler(ButlerConfig butler) async {
+    if (findButler(butler.id) != null) {
+      throw "A butler with this id already exists";
+    }
     var configs = List<ButlerConfig>.from(this._butlerConfigs);
     configs.add(butler);
     await writeButlerConfig(configs);
     this._butlerConfigs.add(butler);
+  }
+
+  Future<SettingsLoaded> deleteButler(String id) async {
+    var configs = List<ButlerConfig>.from(this._butlerConfigs);
+    configs.removeWhere((element) => element.id == id);
+    await writeButlerConfig(configs);
+    this._butlerConfigs = configs;
+    return SettingsLoaded(mqttConfig: _mqttConfig,
+        mqttClient: _mqttClient,
+        butlerConfigs: _butlerConfigs);
   }
 }

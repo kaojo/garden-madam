@@ -13,3 +13,9 @@ class SettingsLoadErrorEvent extends SettingsEvent {
 }
 
 class InvalidMqttSettingsEvent extends SettingsEvent {}
+
+class DeleteButlerEvent extends SettingsEvent {
+  final String id;
+
+  DeleteButlerEvent(this.id);
+}

@@ -32,14 +32,19 @@ class OverviewPageWrapper extends StatelessWidget {
         child: Icon(Icons.add),
         backgroundColor: APPBAR_COLOR,
       ),
-      body: this.butlerConfigs != null && this.butlerConfigs.isNotEmpty
-          ? ListView(
-              children: this
-                  .butlerConfigs
-                  .map((butlerConfig) => _butlerCard(context, butlerConfig))
-                  .toList(),
-            )
-          : Text("Welcome. Please add a butler."),
+      body: RefreshIndicator(
+        onRefresh: () async =>
+            BlocProvider.of<SettingsBloc>(context).add(SettingsReloadEvent()),
+        child: this.butlerConfigs != null && this.butlerConfigs.isNotEmpty
+            ? ListView(
+                children: this
+                    .butlerConfigs
+                    .map((butlerConfig) => _butlerCard(context, butlerConfig))
+                    .toList(),
+              )
+            : ListView(
+                children: <Widget>[Text("Welcome. Please add a butler.")]),
+      ),
     );
   }
 

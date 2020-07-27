@@ -7,24 +7,30 @@ import 'package:garden_madam/repositories/settings_repository.dart';
 import 'mqtt_settings_form.dart';
 
 class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer();
+  final List<Widget> pageDrawerItems;
+
+  NavigationDrawer({List<Widget> pageDrawerItems})
+      : this.pageDrawerItems = pageDrawerItems != null
+            ? pageDrawerItems + <Widget>[Divider(thickness: 2.0)]
+            : <Widget>[];
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
-        children: <Widget>[
-          InkWell(
-            onTap: () => _navigateToMqttSettingsPage(context),
-            child: ListTile(
-              leading: Icon(Icons.settings),
-              title: Text(
-                "Mqtt Settings",
-                textScaleFactor: 1.5,
-              ),
-            ),
-          )
-        ],
+        children: pageDrawerItems +
+            <Widget>[
+              InkWell(
+                onTap: () => _navigateToMqttSettingsPage(context),
+                child: ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Text(
+                    "Mqtt Settings",
+                    textScaleFactor: 1.5,
+                  ),
+                ),
+              )
+            ],
       ),
     );
   }
