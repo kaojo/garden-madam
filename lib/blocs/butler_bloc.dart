@@ -15,15 +15,13 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
   StreamSubscription<Butler> subscription;
 
   ButlerBloc({@required this.butlerRepository})
-      : assert(butlerRepository != null);
+      : assert(butlerRepository != null),
+        super(ButlerEmpty());
 
   void init() {
     add(LoadButler());
     _refreshButlerOnUpdatesReceived();
   }
-
-  @override
-  ButlerState get initialState => ButlerEmpty();
 
   @override
   Stream<ButlerState> mapEventToState(ButlerEvent event) async* {
@@ -79,8 +77,9 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
   }
 
   @override
-  Future<Function> close() {
+  Future<void> close() {
     butlerRepository.close();
     subscription.cancel();
+    return super.close();
   }
 }

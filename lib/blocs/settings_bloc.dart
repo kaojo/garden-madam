@@ -7,20 +7,18 @@ import 'package:garden_madam/repositories/settings_repository.dart';
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SettingsRepository _settingsRepository;
 
-  SettingsBloc(this._settingsRepository) : assert(_settingsRepository != null);
+  SettingsBloc(this._settingsRepository)
+      : assert(_settingsRepository != null),
+        super(SettingsLoading());
 
-  @override
-  SettingsState get initialState {
-    _settingsRepository.init().then(
-      (event) {
-        add(event);
-      },
-      onError: (error, s) {
-        log(error.toString(), error: error, stackTrace: s);
-        add(SettingsLoadErrorEvent(error.toString()));
-      },
-    );
-    return SettingsLoading();
+  Future<void> init() async {
+    try {
+      var event = await _settingsRepository.init();
+      add(event);
+    } catch (error, s) {
+      log(error.toString(), error: error, stackTrace: s);
+      add(SettingsLoadErrorEvent(error.toString()));
+    }
   }
 
   @override

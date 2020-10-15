@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:garden_madam/blocs/blocs.dart';
 import 'package:garden_madam/blocs/butler_bloc.dart';
 import 'package:garden_madam/blocs/butler_state.dart';
+import 'package:garden_madam/repositories/butler_repository.dart';
 
 import 'butler_detail_image_composition.dart';
 import 'butler_page_wrapper.dart';
@@ -27,8 +29,8 @@ class ButlerCard extends StatelessWidget {
             child: Card(
               elevation: 1,
               child: InkWell(
-                onTap: () => _navigateToButlerPage(
-                    context, state.butler.id, state.butler.name),
+                onTap: () =>
+                    _navigateToButlerPage(context, state.butler.butlerConfig),
                 child: Column(
                   children: <Widget>[
                     ButlerDetailImageComposition(butler: state.butler),
@@ -54,16 +56,15 @@ class ButlerCard extends StatelessWidget {
     );
   }
 
-  void _navigateToButlerPage(BuildContext context, String butlerId,
-      String butlerName) {
+  void _navigateToButlerPage(BuildContext context, ButlerConfig config) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (BuildContext newContext) {
           return new ButlerPageWrapper(
-            butlerId: butlerId,
-            butlerName: butlerName,
+            config: config,
             butlerBloc: BlocProvider.of<ButlerBloc>(context),
+            butlerRepository: RepositoryProvider.of<ButlerRepository>(context),
           );
         },
       ),

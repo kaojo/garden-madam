@@ -1,11 +1,12 @@
 import 'dart:collection';
 
+import 'package:garden_madam/blocs/blocs.dart';
 import 'package:garden_madam/models/pin.dart';
 
 class Butler {
   final String name;
   final String id;
-  final butlerConfig;
+  final ButlerConfig butlerConfig;
   List<Pin> _pins;
   bool online = false;
 

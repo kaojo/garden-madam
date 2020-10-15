@@ -16,7 +16,7 @@ import 'package:garden_madam/ui/overview_page_wrapper.dart';
 import 'ui/scaffold.dart';
 import 'ui/theme.dart';
 
-class SimpleBlocDelegate extends BlocDelegate {
+class SimpleBlocDelegate extends BlocObserver {
   @override
   onTransition(Bloc bloc, Transition transition) {
     super.onTransition(bloc, transition);
@@ -25,7 +25,7 @@ class SimpleBlocDelegate extends BlocDelegate {
 }
 
 void main() {
-  BlocSupervisor.delegate = SimpleBlocDelegate();
+  Bloc.observer = SimpleBlocDelegate();
   var settingsRepository = new SettingsRepository();
   runApp(MyApp(settingsRepository: settingsRepository));
 }
@@ -47,6 +47,7 @@ class MyApp extends StatelessWidget {
           var bloc = SettingsBloc(
             RepositoryProvider.of<SettingsRepository>(context),
           );
+          bloc.init();
           return bloc;
         },
         child: MaterialApp(

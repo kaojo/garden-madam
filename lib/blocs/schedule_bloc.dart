@@ -5,7 +5,9 @@ import 'package:garden_madam/repositories/schedule_repository.dart';
 class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   final ScheduleRepository _scheduleRepository;
 
-  ScheduleBloc(this._scheduleRepository) : assert(_scheduleRepository != null);
+  ScheduleBloc(this._scheduleRepository)
+      : assert(_scheduleRepository != null),
+        super(ScheduleState());
 
   @override
   ScheduleState get initialState => ScheduleState();

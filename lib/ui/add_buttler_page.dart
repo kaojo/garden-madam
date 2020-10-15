@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:garden_madam/blocs/add_butler_form_bloc.dart';
 import 'package:garden_madam/blocs/blocs.dart';
-import 'package:garden_madam/blocs/edit_butler_form_bloc.dart';
 import 'package:garden_madam/repositories/settings_repository.dart';
 import 'package:garden_madam/ui/scaffold.dart';
 
@@ -15,16 +15,16 @@ class AddButlerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MyScaffold(
-      title: "Edit Butler",
+      title: "Add Butler",
       body: BlocProvider(
         create: (context) =>
-            EditButlerFormBloc(settingsRepository: settingsRepository),
+            AddButlerFormBloc(settingsRepository: settingsRepository),
         child: Builder(
           builder: (context) {
-            final editButlerFormBloc = context.bloc<EditButlerFormBloc>();
+            final addButlerFormBloc = context.bloc<AddButlerFormBloc>();
 
-            return FormBlocListener<EditButlerFormBloc, ButlerConfig, String>(
-              formBloc: editButlerFormBloc,
+            return FormBlocListener<AddButlerFormBloc, ButlerConfig, String>(
+              formBloc: addButlerFormBloc,
               onSubmitting: (context, state) {
                 LoadingDialog.show(context);
               },
@@ -37,12 +37,12 @@ class AddButlerPage extends StatelessWidget {
                 Scaffold.of(context).showSnackBar(
                     SnackBar(content: Text(state.failureResponse)));
               },
-              child: BlocBuilder<EditButlerFormBloc, FormBlocState>(
+              child: BlocBuilder<AddButlerFormBloc, FormBlocState>(
                 builder: (context, state) {
                   return ListView(
                     children: <Widget>[
                       TextFieldBlocBuilder(
-                        textFieldBloc: editButlerFormBloc.id,
+                        textFieldBloc: addButlerFormBloc.id,
                         keyboardType: TextInputType.text,
                         suffixButton: SuffixButton.clearText,
                         decoration: InputDecoration(
@@ -51,7 +51,7 @@ class AddButlerPage extends StatelessWidget {
                         ),
                       ),
                       TextFieldBlocBuilder(
-                        textFieldBloc: editButlerFormBloc.name,
+                        textFieldBloc: addButlerFormBloc.name,
                         keyboardType: TextInputType.text,
                         suffixButton: SuffixButton.clearText,
                         decoration: InputDecoration(
@@ -61,7 +61,7 @@ class AddButlerPage extends StatelessWidget {
                       ),
                       ListTile(
                         title: RaisedButton(
-                          onPressed: editButlerFormBloc.submit,
+                          onPressed: addButlerFormBloc.submit,
                           child: Text('Add'),
                         ),
                       ),

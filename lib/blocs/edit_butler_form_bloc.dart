@@ -1,44 +1,70 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:garden_madam/blocs/settings_state.dart';
+import 'package:garden_madam/models/butler.dart';
+import 'package:garden_madam/models/pin.dart';
 import 'package:garden_madam/repositories/settings_repository.dart';
 
 class EditButlerFormBloc extends FormBloc<ButlerConfig, String> {
-  final id = TextFieldBloc(
-    // ignore: close_sinks
+  final butlerId = TextFieldBloc(
     validators: [
       FieldBlocValidators.required,
     ],
   );
 
-  final name = TextFieldBloc(
-    // ignore: close_sinks
+  final butlerName = TextFieldBloc(
     validators: [
       FieldBlocValidators.required,
     ],
   );
+
+  final valves = ListFieldBloc<ValveFieldBloc>(name: "Valves");
 
   final SettingsRepository settingsRepository;
 
-  EditButlerFormBloc({this.settingsRepository}) : super(isLoading: false) {
+  final Butler butler;
+  final ButlerConfig butlerConfig;
+
+  EditButlerFormBloc({this.settingsRepository, this.butler, this.butlerConfig})
+      : super(isLoading: false) {
+    butlerId.updateInitialValue(this.butlerConfig.id);
+    butlerName.updateInitialValue(this.butlerConfig.name);
+    for (Pin pin in this.butler.pins) {
+      log(pin.valvePinNumber.toString());
+      valves.addFieldBloc(ValveFieldBloc(
+        number: TextFieldBloc(
+            name: "number", initialValue: pin.valvePinNumber.toString()),
+        valveName: TextFieldBloc(name: "valveName", initialValue: pin.name),
+      ));
+    }
     addFieldBlocs(
-      fieldBlocs: [
-        id,
-        name,
-      ],
+      fieldBlocs: [butlerId, butlerName, valves],
     );
   }
 
   @override
   void onSubmitting() async {
     try {
-      var butler = ButlerConfig(id: id.value?.trim(), name: name.value?.trim());
-      await settingsRepository.saveButler(butler);
-      emitSuccess(successResponse: butler);
+      var butlerConfig = ButlerConfig(
+          id: butlerId.value?.trim(), name: butlerName.value?.trim());
+      await settingsRepository.saveButler(butlerConfig);
+      emitSuccess(successResponse: butlerConfig);
     } catch (error, stacktrace) {
       log("error", error: error, stackTrace: stacktrace);
       emitFailure(failureResponse: error.toString());
     }
   }
+}
+
+class ValveFieldBloc extends GroupFieldBloc {
+  final TextFieldBloc number;
+  final TextFieldBloc valveName;
+
+  ValveFieldBloc({
+    @required this.number,
+    @required this.valveName,
+    String name,
+  }) : super([number, valveName], name: name);
 }
