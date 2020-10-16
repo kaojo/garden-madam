@@ -235,8 +235,9 @@ class SettingsRepository {
     configs.removeWhere((element) => element.id == id);
     await writeButlerConfig(configs);
     this._butlerConfigs = configs;
-    return SettingsLoaded(mqttConfig: _mqttConfig,
+    return SettingsLoaded(
+        mqttConfig: _mqttConfig,
         mqttClient: _mqttClient,
-        butlerConfigs: _butlerConfigs);
+        butlerConfigs: configs);
   }
 }
