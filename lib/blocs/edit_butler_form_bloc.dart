@@ -32,7 +32,6 @@ class EditButlerFormBloc extends FormBloc<ButlerConfig, String> {
     butlerId.updateInitialValue(this.butlerConfig.id);
     butlerName.updateInitialValue(this.butlerConfig.name);
     for (Pin pin in this.butler.pins) {
-      log(pin.valvePinNumber.toString());
       valves.addFieldBloc(ValveFieldBloc(
         number: TextFieldBloc(
             name: "number", initialValue: pin.valvePinNumber.toString()),
@@ -47,9 +46,18 @@ class EditButlerFormBloc extends FormBloc<ButlerConfig, String> {
   @override
   void onSubmitting() async {
     try {
+      List<PinConfig> pinConfigs = [];
+      for (var valve in valves.value) {
+        pinConfigs.add(PinConfig(
+            number: valve.number.valueToInt,
+            name: valve.valveName.value?.trim()));
+      }
+
       var butlerConfig = ButlerConfig(
-          id: butlerId.value?.trim(), name: butlerName.value?.trim());
-      await settingsRepository.saveButler(butlerConfig);
+          id: butlerId.value?.trim(),
+          name: butlerName.value?.trim(),
+          pinConfigs: pinConfigs);
+      await settingsRepository.updateButler(butlerConfig);
       emitSuccess(successResponse: butlerConfig);
     } catch (error, stacktrace) {
       log("error", error: error, stackTrace: stacktrace);

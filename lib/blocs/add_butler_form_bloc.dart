@@ -34,7 +34,7 @@ class AddButlerFormBloc extends FormBloc<ButlerConfig, String> {
   void onSubmitting() async {
     try {
       var butler = ButlerConfig(id: id.value?.trim(), name: name.value?.trim());
-      await settingsRepository.saveButler(butler);
+      await settingsRepository.createButler(butler);
       emitSuccess(successResponse: butler);
     } catch (error, stacktrace) {
       log("error", error: error, stackTrace: stacktrace);

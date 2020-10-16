@@ -1,3 +1,4 @@
+import 'package:garden_madam/blocs/settings_state.dart';
 import 'package:garden_madam/models/models.dart';
 
 abstract class ButlerEvent {
@@ -6,7 +7,11 @@ abstract class ButlerEvent {
 
 class LoadButler extends ButlerEvent {}
 
-class RefreshButler extends ButlerEvent {}
+class ButlerConfigUpdateEvent extends ButlerEvent {
+  final ButlerConfig butlerConfig;
+
+  ButlerConfigUpdateEvent(this.butlerConfig);
+}
 
 class ToggleValveEvent extends ButlerEvent {
   final Pin pin;

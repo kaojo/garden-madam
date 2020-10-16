@@ -17,6 +17,34 @@ class ButlerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<ButlerBloc, ButlerState>(
+      builder: (BuildContext context, ButlerState state) {
+        if (state is ButlerError) {
+          if (state.butler != null) {
+            return _scaffold(
+                context,
+                state.butler.butlerConfig,
+                ButlerDetailsPage(
+                  state.butler,
+                  errorMessage: state.errorMessage,
+                ));
+          }
+        } else if (state is ButlerLoaded) {
+          return _scaffold(context, state.butler.butlerConfig,
+              ButlerDetailsPage(state.butler));
+        } else if (state is ButlerLoading) {
+          return loadingAnimation();
+        }
+        return ListView(
+          children: <Widget>[
+            ErrorMessage('An unknown error occurred.'),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _scaffold(BuildContext context, ButlerConfig config, Widget child) {
     return MyScaffold(
       title: config.name,
       pageDrawerItems: <Widget>[
@@ -25,27 +53,7 @@ class ButlerPage extends StatelessWidget {
       ],
       body: RefreshIndicator(
         onRefresh: () async => _loadButler(context),
-        child: BlocBuilder<ButlerBloc, ButlerState>(
-          builder: (BuildContext context, ButlerState state) {
-            if (state is ButlerError) {
-              if (state.butler != null) {
-                return ButlerDetailsPage(
-                  state.butler,
-                  errorMessage: state.errorMessage,
-                );
-              }
-            } else if (state is ButlerLoaded) {
-              return ButlerDetailsPage(state.butler);
-            } else if (state is ButlerLoading) {
-              return loadingAnimation();
-            }
-            return ListView(
-              children: <Widget>[
-                ErrorMessage('An unknown error occurred.'),
-              ],
-            );
-          },
-        ),
+        child: child,
       ),
     );
   }
@@ -58,7 +66,7 @@ class ButlerPage extends StatelessWidget {
       onTap: () async {
         var butler =
             await RepositoryProvider.of<ButlerRepository>(context).getButler();
-        await Navigator.push(
+        ButlerConfig butlerConfig = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (BuildContext newContext) {
@@ -72,6 +80,8 @@ class ButlerPage extends StatelessWidget {
           ),
         );
         Navigator.of(context).pop();
+        BlocProvider.of<ButlerBloc>(context)
+            .add(ButlerConfigUpdateEvent(butlerConfig));
       },
       child: ListTile(
         leading: Icon(Icons.edit),

@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
@@ -31,6 +30,7 @@ class EditButlerPage extends StatelessWidget {
             butlerConfig: this.config),
         child: Builder(
           builder: (context) {
+            // ignore: close_sinks
             final editButlerFormBloc = context.bloc<EditButlerFormBloc>();
 
             return FormBlocListener<EditButlerFormBloc, ButlerConfig, String>(
@@ -54,35 +54,29 @@ class EditButlerPage extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            TextFieldBlocBuilder(
-                              textFieldBloc: editButlerFormBloc.butlerId,
-                              isEnabled: false,
-                              keyboardType: TextInputType.text,
-                              decoration: InputDecoration(
-                                labelText: 'Id',
-                                prefixIcon: Icon(Icons.perm_identity),
-                              ),
-                            ),
-                            TextFieldBlocBuilder(
-                              textFieldBloc: editButlerFormBloc.butlerName,
-                              keyboardType: TextInputType.text,
-                              suffixButton: SuffixButton.clearText,
-                              decoration: InputDecoration(
-                                labelText: 'Name',
-                                prefixIcon: Icon(Icons.person),
-                              ),
-                            ),
-                          ],
+                        TextFieldBlocBuilder(
+                          textFieldBloc: editButlerFormBloc.butlerId,
+                          isEnabled: false,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            labelText: 'Id',
+                            prefixIcon: Icon(Icons.perm_identity),
+                          ),
+                        ),
+                        TextFieldBlocBuilder(
+                          textFieldBloc: editButlerFormBloc.butlerName,
+                          keyboardType: TextInputType.text,
+                          suffixButton: SuffixButton.clearText,
+                          decoration: InputDecoration(
+                            labelText: 'Name',
+                            prefixIcon: Icon(Icons.person),
+                          ),
                         ),
                         BlocBuilder<ListFieldBloc<ValveFieldBloc>,
                             ListFieldBlocState<ValveFieldBloc>>(
                           cubit: editButlerFormBloc.valves,
                           builder: (context, state) {
                             if (state.fieldBlocs.isNotEmpty) {
-                              log("length: " +
-                                  state.fieldBlocs.length.toString());
                               return ListView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),

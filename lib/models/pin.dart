@@ -15,7 +15,7 @@ class Pin {
 
   String imageName;
 
-  Pin(this.valvePinNumber);
+  Pin(this.valvePinNumber, {this.name});
 
   void addSchedule(Schedule schedule) {
     if (findSchedule(schedule.startTime, schedule.endTime) == null) {

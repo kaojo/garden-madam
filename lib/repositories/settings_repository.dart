@@ -93,15 +93,16 @@ class SettingsRepository {
         var id = c['id'];
         var name = c['name'];
         var pins = c['pinConfigs'];
+        List<PinConfig> pinConfigs = [];
         if (pins != null) {
-          var pinConfigs = [];
           for (var p in pins) {
             var number = p['number'];
             var pinName = p['name'];
             pinConfigs.add(PinConfig(number: number, name: pinName));
           }
         }
-        butlerConfigs.add(ButlerConfig(id: id, name: name));
+        butlerConfigs
+            .add(ButlerConfig(id: id, name: name, pinConfigs: pinConfigs));
       }
       this._butlerConfigs = butlerConfigs;
     }
@@ -121,7 +122,7 @@ class SettingsRepository {
 
   Future<File> writeButlerConfig(List<ButlerConfig> butlerConfigs) async {
     final file = await _localButlerFile;
-
+    log('$butlerConfigs');
     // Write the file.
     return file.writeAsString('$butlerConfigs');
   }
@@ -199,8 +200,8 @@ class SettingsRepository {
     return this._mqttConfig;
   }
 
-  Future<void> saveMqttSettings(String hostname, int port, String username,
-      String password) async {
+  Future<void> saveMqttSettings(
+      String hostname, int port, String username, String password) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
         "mqttHost", hostname != null ? hostname.trim() : null);
@@ -220,7 +221,7 @@ class SettingsRepository {
     return null;
   }
 
-  saveButler(ButlerConfig butler) async {
+  createButler(ButlerConfig butler) async {
     if (findButler(butler.id) != null) {
       throw "A butler with this id already exists";
     }
@@ -228,6 +229,18 @@ class SettingsRepository {
     configs.add(butler);
     await writeButlerConfig(configs);
     this._butlerConfigs.add(butler);
+  }
+
+  updateButler(ButlerConfig updatedButler) async {
+    ButlerConfig oldButler = findButler(updatedButler.id);
+    if (oldButler == null) {
+      throw "A butler with this id was not found";
+    }
+    var configs = List<ButlerConfig>.from(this._butlerConfigs);
+    configs.remove(oldButler);
+    configs.add(updatedButler);
+    this._butlerConfigs = configs;
+    await writeButlerConfig(this._butlerConfigs);
   }
 
   Future<SettingsLoaded> deleteButler(String id) async {

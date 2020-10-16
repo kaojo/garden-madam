@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:garden_madam/blocs/settings_state.dart';
 import 'package:garden_madam/datahandlers/datahandlers.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
@@ -126,6 +127,11 @@ class ButlerRepository {
         .then((_) =>
             this._butler.findPin(schedule.valvePin).addSchedule(schedule));
 
+    return _butler;
+  }
+
+  Future<Butler> updateButlerConfig(ButlerConfig butlerConfig) async {
+    this._butler.updateButlerConfig(butlerConfig);
     return _butler;
   }
 

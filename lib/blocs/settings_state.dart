@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:garden_madam/models/mqtt.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
@@ -26,13 +28,18 @@ class SettingsLoaded extends SettingsState {
 class ButlerConfig {
   String id;
   String name;
-  List<PinConfig> pinConfigs;
+  List<PinConfig> _pinConfigs;
 
-  ButlerConfig({this.id, this.name, this.pinConfigs});
+  ButlerConfig({this.id, this.name, pinConfigs})
+      : this._pinConfigs = pinConfigs;
+
+  UnmodifiableListView<PinConfig> get pinConfigs => _pinConfigs != null
+      ? UnmodifiableListView(_pinConfigs)
+      : UnmodifiableListView([]);
 
   @override
   String toString() {
-    return '{"id": "$id", "name": "$name", "pinConfigs": $pinConfigs}';
+    return '{"id": "$id", "name": "$name", "pinConfigs": $_pinConfigs}';
   }
 }
 

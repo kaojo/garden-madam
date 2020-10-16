@@ -34,13 +34,6 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
         } else {
           yield ButlerLoaded(butler: butler);
         }
-      } else if (event is RefreshButler) {
-        final Butler butler = await butlerRepository.getButler();
-        if (butler == null) {
-          yield ButlerEmpty();
-        } else {
-          yield ButlerLoaded(butler: butler);
-        }
       } else if (event is ToggleValveEvent) {
         Butler butler;
         if (event.toggleDirection == ToggleDirection.on) {
@@ -58,6 +51,10 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
       } else if (event is CreateScheduleEvent) {
         Butler butler = await butlerRepository.createSchedule(event.schedule);
         yield ButlerLoaded(butler: butler);
+      } else if (event is ButlerConfigUpdateEvent) {
+        Butler butler =
+            await butlerRepository.updateButlerConfig(event.butlerConfig);
+        yield ButlerLoaded(butler: butler);
       }
     } catch (e) {
       var errorMessage = "Could not perform action" + event.toString();
@@ -73,7 +70,7 @@ class ButlerBloc extends Bloc<ButlerEvent, ButlerState> {
   void _refreshButlerOnUpdatesReceived() {
     this.subscription = butlerRepository
         .butlerUpdatedStream()
-        .listen((_) => add(RefreshButler()));
+        .listen((_) => add(LoadButler()));
   }
 
   @override
