@@ -86,10 +86,10 @@ class ButlerPage extends StatelessWidget {
   Widget _deleteButler(BuildContext context) {
     return InkWell(
       onTap: () {
-        BlocProvider.of<SettingsBloc>(context).add(
-            DeleteButlerEvent(config.id));
         Navigator.of(context).pop();
         Navigator.of(context).pop();
+        BlocProvider.of<SettingsBloc>(context)
+            .add(DeleteButlerEvent(config.id));
       },
       child: ListTile(
         leading: Icon(Icons.delete),
